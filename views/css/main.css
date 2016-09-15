@@ -1,0 +1,51 @@
+body.main-page {
+    height:100vh;
+    background: url("../img/main-fon.jpg") no-repeat;
+    background-size: 100% 100%;
+}
+.wrapper-main {
+    background: rgba(0,0,0,0.5);
+    padding: 25px;
+    margin-top: 100px;
+}
+.wrapper-main h1{
+    color: #fff;
+    font-size: 50px;
+}
+.wrapper-main p{
+    color: #fff;
+    font-size: 24px;
+}
+body.login-page {
+    height:100vh;
+    background: url("../img/login-fon.jpg") no-repeat;
+    background-size: 100% 100%;
+}
+.wrapper-login {
+    margin-top: 100px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+}
+body.singup-page {
+    height:100vh;
+    background: url("../img/signup-fon.jpg") no-repeat;
+    background-size: 100% 100%;
+}
+.wrapper-singup {
+    margin-top: 100px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+}
+.wrapper-singup a{
+    color: orange;
+}
+.wrapper-singup h1,
+.wrapper-singup label,
+.wrapper-singup p{
+    color: #fff;
+}
+body.profile-page {
+    height:100vh;
+    background: url("../img/profile-fon.jpg") no-repeat;
+    background-size: 100% 100%;
+}
