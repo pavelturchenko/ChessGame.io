@@ -1,0 +1,171 @@
+@charset "utf-8";
+table {
+	width: 500px;
+	height: 500px;
+	border: 1px solid #000;
+	border-collapse: collapse;
+	position: relative;
+	left: 50%;
+	margin-left: -250px;
+	margin-top: 5%;
+}
+table tr {
+	border: 1px solid #000;
+	width: 60px;
+	height: 61px;
+}
+table td {
+	border: 1px solid #000;
+	background: #d8a459;
+	position: relative;
+	z-index: 1;
+	box-sizing: border-box;
+	padding: 0;
+	width:60px;
+	height:60px;
+}
+table td.black {
+	background: #8b4e21;
+}
+table td span {
+	cursor: pointer;
+}
+table td span.bP {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bP.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.bR {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bR.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.bN {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bN.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.bB {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bB.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.bQ {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bQ.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.bK {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/black/bK.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wP {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wP.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wR {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wR.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wN {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wN.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wB {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wB.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wQ {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wQ.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.wK {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background: url(images/white/wK.png) no-repeat;
+	background-size: 100% 100%;
+}
+table td span.absol{
+	position: absolute;
+	z-index: 5;
+	max-width: 62px;
+	max-height: 62px;
+}
+table td span.focus{
+	position: relative;
+	z-index: 4;
+	max-width: 62px;
+	max-height: 62px;
+	box-shadow: inset 0 0 15px rgba(80,255,0,0.75);
+}
+table td.kill span{
+	position: relative;
+	z-index: 4;
+	max-width: 62px;
+	max-height: 62px;
+	box-shadow: inset 0 0 15px rgba(255,0,0,0.75);
+}
+table td.go{
+	cursor: pointer;
+}
+table td.go:before{
+	content: "";
+	position: absolute;
+	z-index: 2;
+	width: 16px;
+	height: 16px;
+	top:50%;
+	left:50%;
+	margin: -8px 0 0 -8px;
+	box-shadow: inset 0 0 15px rgba(80,255,0,0.75);
+	border-radius: 50%;
+}
+.transformPawn{
+	position: absolute;
+	z-index: 100;
+	left: 50%;
+	margin-left: -100px;
+	top: 10%;
+	background-color: #ebebeb;
+	border:1px solid #ebebeb;
+}
+.transformPawn img{
+	cursor:pointer;
+}
+.wrapper-transformPawn{
+	position: absolute;
+	z-index: 99;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+}
