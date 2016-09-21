@@ -1,3 +1,9 @@
+ul {
+    padding:0;
+}
+ul li {
+    list-style-type: none;
+}
 body.main-page {
     height:100vh;
     background: url("../img/main-fon.jpg") no-repeat;
@@ -48,4 +54,67 @@ body.profile-page {
     height:100vh;
     background: url("../img/profile-fon.jpg") no-repeat;
     background-size: 100% 100%;
+}
+.start-game {
+    margin-top: 20px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 30px;
+    text-align: center;
+}
+.start-game a{
+    font-size: 50px;
+    font-weight: bold;
+    color: #fff;
+}
+.start-game a:hover{
+    text-decoration: none;
+}
+.enter-game {
+    margin: 50px 0;
+    background: rgba(0,0,0,0.3);
+    max-width: 60%;
+    display: inline-block;
+    vertical-align: top;
+    min-height: 300px;
+    width: 100%;
+}
+.enter-game ul{
+    padding: 0;
+}
+.enter-game li{
+    list-style-type: none;
+    height:30px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 10px;
+    margin: 1px 0;
+}
+.enter-game li:hover{
+    background: rgba(0,0,0,0.5);
+    cursor: pointer;
+}
+.enter-game a{
+    color: #fff;
+}
+.creare-game {
+    display: inline-block;
+    vertical-align: top;
+    background: rgba(0,0,0,0.5);
+    max-width: 38%;
+    margin: 50px 0 0 10px;
+    width: 100%;
+}
+.creare-game a{
+    font-size: 18px;
+    color: #000;
+    display: block;
+    width: 150px;
+    height:50px;
+    margin: 20px auto;
+    background: rgba(255,255,255,1);
+    border-radius: 20px;
+    text-align: center;
+    padding-top: 13px;
+}
+.creare-game a:hover{
+    text-decoration: none;
 }
