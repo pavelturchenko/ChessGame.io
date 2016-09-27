@@ -5,6 +5,8 @@
 // get all the tools we need
 var express  = require('express');
 var app      = express();
+var http = require('http');
+var server = http.createServer(app);
 var port     = process.env.PORT || 8080;
 var mongoose = require('mongoose');
 var passport = require('passport');
@@ -16,6 +18,8 @@ var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
 var configDB = require('./config/database.js');
+
+var io = require('socket.io').listen(server);
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -36,8 +40,8 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(express.static(__dirname + '/views'));
 // routes ======================================================================
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, io); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
-app.listen(port);
+server.listen(port);
 console.log('The magic happens on port ' + port);

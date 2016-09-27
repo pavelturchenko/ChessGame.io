@@ -4,6 +4,9 @@ ul {
 ul li {
     list-style-type: none;
 }
+a {
+    cursor:pointer;
+}
 body.main-page {
     height:100vh;
     background: url("../img/main-fon.jpg") no-repeat;
@@ -80,6 +83,7 @@ body.profile-page {
 }
 .enter-game ul{
     padding: 0;
+    margin-bottom: 0;
 }
 .enter-game li{
     list-style-type: none;
