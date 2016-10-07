@@ -6,6 +6,7 @@ ul li {
 }
 a {
     cursor:pointer;
+    display: block;
 }
 body.main-page {
     height:100vh;
