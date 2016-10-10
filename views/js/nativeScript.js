@@ -1,7 +1,21 @@
 /**
  * Created by prog on 05.09.16.
  */
-"use strict"
+"use strict";
+
+var socket = io(),
+    personID;
+
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+var creatorSessionID = getCookie('ChessGame');
+var personSessionID = getCookie('persSesID');
+console.log(creatorSessionID);
+console.log(personSessionID);
 
 ;(function(){
     function Game(){
@@ -84,7 +98,7 @@
                     rows[j].appendChild(span);
                 }
             }
-        }
+        };
         Game.buildTable();
     }
 
@@ -92,4 +106,6 @@
     window.__games = Game;
 })();
 
-var newGame = __games();
+var newGame = __games(creatorSessionID);
+
+

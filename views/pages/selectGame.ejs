@@ -21,53 +21,6 @@
     </div>
 </div>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-
-    var socket = io(),
-        personID;
-
-    var creatorSessionID;
-
-    socket.emit('connectServer');
-
-    socket.on('connectServer', function(personSessionID){
-        personID = personSessionID;
-        console.log(personID);
-    });
-
-//    Create new game
-
-    $(document).on('click', '#createGame', function(){
-        socket.emit('createGame', personID);
-        return false;
-    });
-    socket.on('createGame', function(personID){
-        var creatorID = personID;
-        $('.enter-game > ul').append("<li><a class='newGame' data-creatorid="+creatorID+">" + "Game" + "</a></li>")
-    });
-
-// Connection to game
-
-    $(document).on('click', '.newGame', function(){
-        var creatorID = $(this).attr('data-creatorid');
-        console.log(creatorID);
-        socket.emit("connectToGame", creatorID);
-    });
-
-    socket.on("connectToGame", function(creatorID, personSessionID){
-
-        var creatorID = creatorID;
-        var personSessionID = personSessionID;
-
-        if(creatorID === personSessionID || personSessionID === personID) {
-            creatorSessionID = creatorID;
-            location.href = '/game';
-        }
-
-    });
-
-
-</script>
-
+<script src="../js/socket.js"></script>
 </body>
 </html>

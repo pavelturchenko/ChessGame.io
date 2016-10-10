@@ -3,17 +3,18 @@ var Game            = require('../app/models/listGame');
 module.exports = function(app, passport, io) {
 
     var personSessionID;
+    var creatorSessionID;
 
     // =====================================
     // HOME PAGE (with login links) ========
     // =====================================
     app.get('/', function (req, res) {
         personSessionID = req.sessionID;
+        
         res.render('pages/index.ejs'); // load the index.ejs file
     });
 
     app.get('/selection-game', function (req, res) {
-        personSessionID = req.sessionID;
         res.render('pages/selectGame.ejs'); // load the index.ejs file
     });
 
@@ -24,7 +25,6 @@ module.exports = function(app, passport, io) {
     // show the login form
     app.get('/login', function (req, res) {
         // render the page and pass in any flash data if it exists
-        personSessionID = req.sessionID;
         res.render('pages/login.ejs', {message: req.flash('loginMessage')});
     });
 
@@ -41,7 +41,6 @@ module.exports = function(app, passport, io) {
     // show the signup form
     app.get('/signup', function (req, res) {
         // render the page and pass in any flash data if it exists
-        personSessionID = req.sessionID;
         res.render('pages/signup.ejs', {message: req.flash('signupMessage')});
     });
 
@@ -58,13 +57,11 @@ module.exports = function(app, passport, io) {
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
     app.get('/profile', isLoggedIn, function (req, res) {
-        personSessionID = req.sessionID;
         res.render('pages/profile.ejs', {
             user: req.user // get the user out of session and pass to template
         });
     });
     app.get('/game', function (req, res) {
-        personSessionID = req.sessionID;
         res.render('pages/game.ejs');
     });
 
@@ -91,14 +88,20 @@ module.exports = function(app, passport, io) {
         });
 
         socket.on("connectToGame", function(creatorID){
-            // io.emit("connectToGame");
-            var creatorID = creatorID,
-                newGame = new Game();
 
-            newGame.game.creatorID = creatorID;
+            var newGame = new Game();
+
+            creatorSessionID = creatorID;
+
+            newGame.game.gameID = '1';
+            newGame.game.creatorID = creatorSessionID;
             newGame.game.joinedID = personSessionID;
 
-            io.emit("connectToGame", creatorID, personSessionID);
+            io.emit("connectToGame", creatorSessionID, personSessionID);
+        });
+
+        socket.on('connectServerGame', function () {
+            io.emit('connectServerGame', personSessionID);
         });
 
         socket.on('disconnect', function () {
@@ -116,3 +119,4 @@ function isLoggedIn(req, res, next) {
     // if they aren't redirect them to the home page
     res.redirect('/');
 };
+

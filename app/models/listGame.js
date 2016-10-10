@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var gameListSchema = mongoose.Schema({
 
     game : {
+        gameID : String,
         creatorID : String,
         joinedID : String
     }
