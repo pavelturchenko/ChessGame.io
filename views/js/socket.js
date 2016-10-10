@@ -4,7 +4,7 @@
 
 var socket = io(),
     personID;
-var option;
+// var option;
 var creatorSessionID;
 
 socket.emit('connectServer');
@@ -28,7 +28,7 @@ socket.on('createGame', function(personID){
 
 $(document).on('click', '.newGame', function(){
     var creatorID = $(this).attr('data-creatorid');
-    socket.emit("connectToGame", creatorID);
+    socket.emit("connectToGame", creatorID, personID);
 });
 
 socket.on("connectToGame", function(creatorID, personSessionID){
@@ -39,8 +39,8 @@ socket.on("connectToGame", function(creatorID, personSessionID){
     if(creatorID === personSessionID || personSessionID === personID) {
         creatorSessionID = creatorID;
 
-        option = (36000);
-        setCookie("ChessGame", creatorSessionID, option);
+        // option = (36000);
+        // setCookie("ChessGame", creatorSessionID, option);
         location.href = '/game';
     }
 

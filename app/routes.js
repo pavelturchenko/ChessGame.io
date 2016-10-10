@@ -1,16 +1,19 @@
 var Game            = require('../app/models/listGame');
+var Anonymous            = require('../app/models/anonymous');
 
 module.exports = function(app, passport, io) {
 
     var personSessionID;
     var creatorSessionID;
 
+    var newAnonymous = new Anonymous();
     // =====================================
     // HOME PAGE (with login links) ========
     // =====================================
     app.get('/', function (req, res) {
-        personSessionID = req.sessionID;
-        
+        newAnonymous.anonymous.anonymousID = req.sessionID;
+        console.log(newAnonymous.anonymous.anonymousID + " ID");
+        res.cookie('personID', newAnonymous.anonymous.anonymousID);
         res.render('pages/index.ejs'); // load the index.ejs file
     });
 
@@ -87,11 +90,12 @@ module.exports = function(app, passport, io) {
             io.emit('createGame', personID);
         });
 
-        socket.on("connectToGame", function(creatorID){
+        socket.on("connectToGame", function(creatorID, personID){
 
             var newGame = new Game();
 
             creatorSessionID = creatorID;
+            personSessionID = personID;
 
             newGame.game.gameID = '1';
             newGame.game.creatorID = creatorSessionID;

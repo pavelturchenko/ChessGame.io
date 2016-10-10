@@ -19,7 +19,7 @@ console.log(personSessionID);
 
 ;(function(){
     function Game(){
-        Game.player = true,
+        Game.player = true;
         Game.elemClass = "";
         Game.buildTable = function(){
             document.write('<table>');
@@ -44,36 +44,37 @@ console.log(personSessionID);
             }
             document.write('</table>');
             Game.addFigureToBoard();
-        },
+        };
         Game.addFigureToBoard = function() {
             var cells = document.getElementsByTagName('tr');
             for (var i = 0; i < cells.length; i++) {
+                var rows;
                 if (i === 0) {
-                    var rows = cells[i].getElementsByTagName('td')
+                    rows = cells[i].getElementsByTagName('td');
                     Game.rowsOldestFigure(rows, "b");
                 }
                 if (i === 1) {
-                    var rows = cells[i].getElementsByTagName('td');
+                    rows = cells[i].getElementsByTagName('td');
                     Game.rowsPawn(rows, "b");
                 }
                 if (i === 6) {
-                    var rows = cells[i].getElementsByTagName('td')
+                    rows = cells[i].getElementsByTagName('td');
                     Game.rowsPawn(rows, "w");
                 }
                 if (i === 7) {
-                    var rows = cells[i].getElementsByTagName('td');
+                    rows = cells[i].getElementsByTagName('td');
                     Game.rowsOldestFigure(rows, "w");
                 }
 
             }
-        },
+        };
         Game.rowsPawn = function(rows, figureColor){
             for (var j = 0; j < 8; j++) {
                 var span = document.createElement('span');
                 span.className = figureColor + "P";
                 rows[j].appendChild(span);
             }
-        },
+        };
         Game.rowsOldestFigure = function(rows, figureColor){
             for (var j = 0; j < 8; j++) {
                 var span = document.createElement('span');
