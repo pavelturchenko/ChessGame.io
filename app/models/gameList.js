@@ -3,12 +3,8 @@ var mongoose = require('mongoose');
 // define the schema for our user model
 var gameListSchema = mongoose.Schema({
 
-    game : {
-        gameID : String,
-        creatorID : String,
-        joinedID : String
-    }
-
+    gameListID : String
+    
 });
 
 

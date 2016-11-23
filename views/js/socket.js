@@ -4,24 +4,36 @@
 
 var socket = io(),
     personID;
-// var option;
-var creatorSessionID;
 
-socket.emit('connectServer');
 
-socket.on('connectServer', function(personSessionID){
-    personID = personSessionID;
-});
 
 //    Create new game
 
 $(document).on('click', '#createGame', function(){
-    socket.emit('createGame', personID);
+    var creatorID = getCookie("personID");
+    socket.emit('createGame', creatorID);
     return false;
 });
-socket.on('createGame', function(personID){
-    var creatorID = personID;
-    $('.enter-game > ul').append("<li><a class='newGame' data-creatorid="+creatorID+">" + "Game" + "</a></li>")
+
+
+socket.on('createGame', function(creatorID){
+    var arrayTrueDate = false,
+        dataCreate,
+        addGame = "<li><a class='newGame' data-creatorid="+creatorID+">" + "Game" + "</a></li>",
+        listGames = $('.enter-game ul');
+    if(listGames.children().length == 0){
+        $('.enter-game > ul').append(addGame);
+    } else {
+        listGames.find("a").each(function(){
+            dataCreate = $(this).attr("data-creatorid");
+            if(dataCreate === creatorID){
+                arrayTrueDate = true;
+            }
+        });
+        if(arrayTrueDate === false){
+            $('.enter-game > ul').append(addGame);
+        }
+    }
 });
 
 // Connection to game
@@ -33,41 +45,16 @@ $(document).on('click', '.newGame', function(){
 
 socket.on("connectToGame", function(creatorID, personSessionID){
 
-    var creatorID = creatorID;
-    var personSessionID = personSessionID;
+    var creatorID = creatorID,
+        personSessionID = personSessionID;
 
     if(creatorID === personSessionID || personSessionID === personID) {
         creatorSessionID = creatorID;
-
-        // option = (36000);
-        // setCookie("ChessGame", creatorSessionID, option);
         location.href = '/game';
     }
 
 });
 
-function setCookie(name, value, option){
-    option = option || {};
-    var expires = option.expires;
-    if(typeof expires == "number" && expires) {
-        var d = new Date();
-        d.setTime(d.getTime() + expires*1000);
-        expires = option.experis = d;
-    }
-    if(expires && expires.toUTCString) {
-        option.expires = expires.toUTCString();
-    }
-    value = encodeURIComponent(value);
-    var updateCookie = name + "=" + value;
-    for (var propName in option){
-        updateCookie += '; ' + propName;
-        var propValue = option[propName];
-        if(propValue !== true) {
-            updateCookie += '='+propValue;
-        }
-    }
-    document.cookie = updateCookie;
-}
 function getCookie(name) {
     var matches = document.cookie.match(new RegExp(
         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"

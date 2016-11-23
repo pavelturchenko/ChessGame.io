@@ -1,10 +1,8 @@
-var Game            = require('../app/models/listGame');
-var Anonymous            = require('../app/models/anonymous');
+var Game = require('../app/models/game'),
+    Anonymous = require('../app/models/anonymous'),
+    GameList = require('../app/models/gameList');
 
 module.exports = function(app, passport, io) {
-
-    var personSessionID;
-    var creatorSessionID;
 
     var newAnonymous = new Anonymous();
     // =====================================
@@ -12,7 +10,6 @@ module.exports = function(app, passport, io) {
     // =====================================
     app.get('/', function (req, res) {
         newAnonymous.anonymous.anonymousID = req.sessionID;
-        console.log(newAnonymous.anonymous.anonymousID + " ID");
         res.cookie('personID', newAnonymous.anonymous.anonymousID);
         res.render('pages/index.ejs'); // load the index.ejs file
     });
@@ -81,25 +78,40 @@ module.exports = function(app, passport, io) {
     io.on('connection', function (socket) {
         console.log('a user connection');
 
-        socket.on('connectServer', function () {
-           io.emit('connectServer', personSessionID);
-        });
-        
-        
-        socket.on('createGame', function (personID) {
-            io.emit('createGame', personID);
+
+        socket.on('createGame', function (creatorID) {
+            /*При создании игры заносим созданные игры в базу данных*/
+
+            var addGameToList = new GameList({gameListID : creatorID});
+
+            addGameToList.save(function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log(GameList.find({ "gameListID" : "dgadTEvu8NkbkrpdC58cVrsF"}));
+                }
+            });
+
+
+
+            io.emit('createGame', creatorID);
         });
 
         socket.on("connectToGame", function(creatorID, personID){
+
+            /*Заносим в базу данных id игроков, переделать на создание отдельной комнаты*/
 
             var newGame = new Game();
 
             creatorSessionID = creatorID;
             personSessionID = personID;
 
-            newGame.game.gameID = '1';
+            newGame.game.gameID = creatorSessionID;
             newGame.game.creatorID = creatorSessionID;
             newGame.game.joinedID = personSessionID;
+
+            /*После подключения к игроку дописать удаления этой игры из списка доступных игр*/
+
 
             io.emit("connectToGame", creatorSessionID, personSessionID);
         });
