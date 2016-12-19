@@ -21,5 +21,13 @@
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="../js/socket.js"></script>
+<script text="javascript">
+    socket.emit('selectGame');
+    socket.on('selectGame', function(gameMap){
+        for (var key in gameMap){
+            $('.enter-game > ul').append("<li><a class='newGame' data-creatorid="+gameMap[key]+">" + "Game" + "</a></li>");
+        }
+    });
+</script>
 </body>
 </html>

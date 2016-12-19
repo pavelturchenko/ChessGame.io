@@ -77,30 +77,46 @@ module.exports = function(app, passport, io) {
      */
     io.on('connection', function (socket) {
         console.log('a user connection');
+        var addGameToList = new GameList();
+        // Function to remove all schema
+        // GameList.remove({}, function (err) {});
 
-
-        socket.on('createGame', function (creatorID) {
-            /*При создании игры заносим созданные игры в базу данных*/
-
-            var addGameToList = new GameList({gameListID : creatorID});
-
-            addGameToList.save(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(GameList.find({ "gameListID" : "dgadTEvu8NkbkrpdC58cVrsF"}));
-                }
+        socket.on('selectGame', function () {
+            var gameMap = {};
+            GameList.find({}, function(err, gameListID){
+                gameListID.forEach(function(gameListID) {
+                    gameMap[gameListID._id] = gameListID.gameListID;
+                });
+                io.emit('selectGame', gameMap)
             });
 
+        });
 
-
+        socket.on('createGame', function (creatorID) {
+            /*При создании игры заносим созданные игры в базу данных
+            * Проверяем наличие этой игры в базе, если есть, то не даобавляем*/
+            GameList.find({}, function(err, gameListID){
+                var gameGreatEarlier = false;
+                gameListID.forEach(function(gameListID) {
+                    if(gameListID.gameListID === creatorID) {
+                        gameGreatEarlier = true;
+                        console.log(gameGreatEarlier +"0");
+                        return false;
+                    }
+                });
+                if (gameGreatEarlier === false){
+                    console.log(gameGreatEarlier + "1");
+                    addGameToList.gameListID = creatorID;
+                    addGameToList.save(function (err, addGameToList, affected) {
+                        if(err) throw err;
+                    });
+                }
+            });
             io.emit('createGame', creatorID);
         });
 
         socket.on("connectToGame", function(creatorID, personID){
-
             /*Заносим в базу данных id игроков, переделать на создание отдельной комнаты*/
-
             var newGame = new Game();
 
             creatorSessionID = creatorID;
@@ -121,7 +137,7 @@ module.exports = function(app, passport, io) {
         });
 
         socket.on('disconnect', function () {
-            console.log('user disconnect');
+            console.log(this.id);
         })
     });
 };
