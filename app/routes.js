@@ -1,20 +1,18 @@
 var Game = require('../app/models/game'),
-    Anonymous = require('../app/models/anonymous'),
     GameList = require('../app/models/gameList');
 
 module.exports = function(app, passport, io) {
 
-    var newAnonymous = new Anonymous();
     // =====================================
     // HOME PAGE (with login links) ========
     // =====================================
     app.get('/', function (req, res) {
-        newAnonymous.anonymous.anonymousID = req.sessionID;
-        res.cookie('personID', newAnonymous.anonymous.anonymousID);
+        res.cookie('personID', req.sessionID);
         res.render('pages/index.ejs'); // load the index.ejs file
     });
 
     app.get('/selection-game', function (req, res) {
+        res.cookie('personID', req.sessionID);
         res.render('pages/selectGame.ejs'); // load the index.ejs file
     });
 
@@ -80,6 +78,7 @@ module.exports = function(app, passport, io) {
         var addGameToList = new GameList();
         // Function to remove all schema
         // GameList.remove({}, function (err) {});
+        Game.remove({}, function (err) {});
 
         socket.on('selectGame', function () {
             var gameMap = {};
@@ -100,36 +99,42 @@ module.exports = function(app, passport, io) {
                 gameListID.forEach(function(gameListID) {
                     if(gameListID.gameListID === creatorID) {
                         gameGreatEarlier = true;
-                        console.log(gameGreatEarlier +"0");
                         return false;
                     }
                 });
                 if (gameGreatEarlier === false){
-                    console.log(gameGreatEarlier + "1");
                     addGameToList.gameListID = creatorID;
+                    addGameToList.socketCreateID = socket.id;
                     addGameToList.save(function (err, addGameToList, affected) {
                         if(err) throw err;
                     });
                 }
             });
+            socket.join('games' + creatorID);
             io.emit('createGame', creatorID);
         });
 
         socket.on("connectToGame", function(creatorID, personID){
+            var games = 'games' + creatorID;
+            socket.join(games);
             /*Заносим в базу данных id игроков, переделать на создание отдельной комнаты*/
             var newGame = new Game();
-
-            creatorSessionID = creatorID;
-            personSessionID = personID;
-
-            newGame.game.gameID = creatorSessionID;
-            newGame.game.creatorID = creatorSessionID;
-            newGame.game.joinedID = personSessionID;
-
-            /*После подключения к игроку дописать удаления этой игры из списка доступных игр*/
-
-
-            io.emit("connectToGame", creatorSessionID, personSessionID);
+            newGame.gameID = games;
+            newGame.creatorID = creatorID;
+            newGame.joinedID = personID;
+            newGame.save(function (err, newGame, affected) {
+                if(err) throw err;
+            });
+            var gameMap = {};
+            Game.find({}, function(err, gameID){
+                gameID.forEach(function(gameID) {
+                    gameMap[gameID._id] = gameID.gameID;
+                    gameMap[gameID._id + " 1"] = gameID.creatorID;
+                    gameMap[gameID._id + " 2"] = gameID.joinedID;
+                });
+                console.log(gameMap)
+            });
+            io.to(games).emit('redirect', games);
         });
 
         socket.on('connectServerGame', function () {
@@ -137,7 +142,8 @@ module.exports = function(app, passport, io) {
         });
 
         socket.on('disconnect', function () {
-            console.log(this.id);
+            /*Удаляем игру*/
+            GameList.findOne({"socketCreateID" : this.id}).remove().exec();
         })
     });
 };
