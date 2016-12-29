@@ -11,6 +11,7 @@ var socket = io(),
 
 $(document).on('click', '#createGame', function(){
     var creatorID = getCookie("personID");
+
     socket.emit('createGame', creatorID);
     return false;
 });
@@ -40,19 +41,15 @@ socket.on('createGame', function(creatorID){
 
 $(document).on('click', '.newGame', function(){
     var creatorID = $(this).attr('data-creatorid');
+    personID = getCookie("personID");
+    if(personID === creatorID) {
+        return false;
+    }
     socket.emit("connectToGame", creatorID, personID);
 });
 
-socket.on("connectToGame", function(creatorID, personSessionID){
-
-    var creatorID = creatorID,
-        personSessionID = personSessionID;
-
-    if(creatorID === personSessionID || personSessionID === personID) {
-        creatorSessionID = creatorID;
-        location.href = '/game';
-    }
-
+socket.on("redirect", function(){
+    location.href = '/game';
 });
 
 function getCookie(name) {

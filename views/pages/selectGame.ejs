@@ -21,5 +21,29 @@
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="../js/socket.js"></script>
+<script type="text/javascript">
+    socket.emit('selectGame');
+    socket.on('selectGame', function(gameMap){
+        buildGameList(gameMap);
+    });
+    socket.on('disconnectServer', function(gameMap){
+        $('.enter-game > ul > li').remove();
+        buildGameList(gameMap)
+    });
+    function buildGameList(gameMap){
+        for (var key in gameMap){
+            var control = true;
+            $('.enter-game li').each(function(i){
+                var elem = $(this).children().data('creatorid');
+                if(gameMap[key] == elem){
+                    control = false;
+                }
+            });
+            if (control){
+                $('.enter-game > ul').append("<li><a class='newGame' data-creatorid="+gameMap[key]+">" + "Game" + "</a></li>");
+            }
+        }
+    }
+</script>
 </body>
 </html>

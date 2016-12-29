@@ -1,20 +1,18 @@
 var Game = require('../app/models/game'),
-    Anonymous = require('../app/models/anonymous'),
     GameList = require('../app/models/gameList');
 
 module.exports = function(app, passport, io) {
 
-    var newAnonymous = new Anonymous();
     // =====================================
     // HOME PAGE (with login links) ========
     // =====================================
     app.get('/', function (req, res) {
-        newAnonymous.anonymous.anonymousID = req.sessionID;
-        res.cookie('personID', newAnonymous.anonymous.anonymousID);
+        res.cookie('personID', req.sessionID);
         res.render('pages/index.ejs'); // load the index.ejs file
     });
 
     app.get('/selection-game', function (req, res) {
+        res.cookie('personID', req.sessionID);
         res.render('pages/selectGame.ejs'); // load the index.ejs file
     });
 
@@ -76,63 +74,111 @@ module.exports = function(app, passport, io) {
      * buildNewGame
      */
     io.on('connection', function (socket) {
-        console.log('a user connection');
+        // console.log('a user connection -> ' + socket.id);
+        var addGameToList = new GameList();
+        // Function to remove all schema
+        // GameList.remove({}, function (err) {});
+        // Game.remove({}, function (err) {});
 
-
-        socket.on('createGame', function (creatorID) {
-            /*При создании игры заносим созданные игры в базу данных*/
-
-            var addGameToList = new GameList({gameListID : creatorID});
-
-            addGameToList.save(function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(GameList.find({ "gameListID" : "dgadTEvu8NkbkrpdC58cVrsF"}));
-                }
+        socket.on('selectGame', function () {
+            var gameMap = {};
+            GameList.find({}, function(err, gameListID){
+                gameListID.forEach(function(gameListID) {
+                    gameMap[gameListID._id] = gameListID.gameListID;
+                });
+                io.emit('selectGame', gameMap)
             });
 
+        });
 
-
+        socket.on('createGame', function (creatorID) {
+            /*При создании игры заносим созданные игры в базу данных
+             * Проверяем наличие этой игры в базе, если есть, то не даобавляем*/
+            GameList.find({}, function(err, gameListID){
+                var gameGreatEarlier = false;
+                gameListID.forEach(function(gameListID) {
+                    if(gameListID.gameListID === creatorID) {
+                        gameGreatEarlier = true;
+                        return false;
+                    }
+                });
+                if (gameGreatEarlier === false){
+                    addGameToList.gameListID = creatorID;
+                    addGameToList.socketCreateID = socket.id;
+                    addGameToList.save(function (err, addGameToList, affected) {
+                        if(err) throw err;
+                    });
+                }
+            });
+            socket.join('games' + creatorID);
             io.emit('createGame', creatorID);
         });
 
         socket.on("connectToGame", function(creatorID, personID){
-
+            if(creatorID === personID){
+                return false
+            }
+            var games = 'games' + creatorID;
+            socket.join(games);
             /*Заносим в базу данных id игроков, переделать на создание отдельной комнаты*/
-
             var newGame = new Game();
-
-            creatorSessionID = creatorID;
-            personSessionID = personID;
-
-            newGame.game.gameID = creatorSessionID;
-            newGame.game.creatorID = creatorSessionID;
-            newGame.game.joinedID = personSessionID;
-
-            /*После подключения к игроку дописать удаления этой игры из списка доступных игр*/
-
-
-            io.emit("connectToGame", creatorSessionID, personSessionID);
+            newGame.gameID = games;
+            newGame.creatorID = creatorID;
+            newGame.joinedID = personID;
+            newGame.save(function (err, newGame, affected) {
+                if(err) throw err;
+            });
+            var gameMap = {};
+            Game.find({}, function(err, gameID){
+                gameID.forEach(function(gameID) {
+                    gameMap[gameID._id] = gameID.gameID;
+                    gameMap[gameID._id + " 1"] = gameID.creatorID;
+                    gameMap[gameID._id + " 2"] = gameID.joinedID;
+                });
+            });
+            io.to(games).emit('redirect', games);
         });
 
         socket.on('connectServerGame', function () {
             io.emit('connectServerGame', personSessionID);
         });
 
+        socket.on('step', function(personID){
+            Game.find({}, function(err, gameID){
+                gameID.forEach(function(gameID) {
+                    if(gameID.creatorID === personID || gameID.joinedID === personID) {
+                        console.log(gameID.gameID);
+                        var games = gameID.gameID;
+                        io.to(games).emit('emit', games);
+                        return false
+                    }
+                });
+            });
+        });
+
         socket.on('disconnect', function () {
-            console.log('user disconnect');
+            // console.log('user disconnet  -> ' + socket.id)
+            var disconnentId = this.id;
+            /*Удаляем игру*/
+            GameList.find({}, function(err, gameListID){
+                var gameMap = {};
+                gameListID.forEach(function(gameListID) {
+                    if(gameListID.socketCreateID == disconnentId){
+                        GameList.remove({"socketCreateID": disconnentId}, function(err, users){});
+                    } else {
+                        gameMap[gameListID._id] = gameListID.gameListID;
+                    }
+                });
+                io.emit('disconnectServer', gameMap)
+            });
         })
     });
 };
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
-
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated())
         return next();
-
     // if they aren't redirect them to the home page
     res.redirect('/');
 };
-
