@@ -1,0 +1,12 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/socket.js"></script>
+
+<% if (pages === "selectGame") {%>
+
+    <% include footer-partials/footer-selectGame %>
+
+<% } else if(pages === "game") {%>
+
+    <% include footer-partials/footer-game %>
+
+<% } %>

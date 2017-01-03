@@ -8,12 +8,12 @@ module.exports = function(app, passport, io) {
     // =====================================
     app.get('/', function (req, res) {
         res.cookie('personID', req.sessionID);
-        res.render('pages/index.ejs'); // load the index.ejs file
+        res.render('pages/index.ejs', {pages: 'index'}); // load the index.ejs file
     });
 
     app.get('/selection-game', function (req, res) {
         res.cookie('personID', req.sessionID);
-        res.render('pages/selectGame.ejs'); // load the index.ejs file
+        res.render('pages/index.ejs', {pages: 'selectGame'});
     });
 
 
@@ -60,7 +60,7 @@ module.exports = function(app, passport, io) {
         });
     });
     app.get('/game', function (req, res) {
-        res.render('pages/game.ejs');
+        res.render('pages/index.ejs', {pages: 'game'});
     });
 
     // =====================================
@@ -128,14 +128,14 @@ module.exports = function(app, passport, io) {
             newGame.save(function (err, newGame, affected) {
                 if(err) throw err;
             });
-            var gameMap = {};
-            Game.find({}, function(err, gameID){
-                gameID.forEach(function(gameID) {
-                    gameMap[gameID._id] = gameID.gameID;
-                    gameMap[gameID._id + " 1"] = gameID.creatorID;
-                    gameMap[gameID._id + " 2"] = gameID.joinedID;
-                });
-            });
+            // var gameMap = {};
+            // Game.find({}, function(err, gameID){
+            //     gameID.forEach(function(gameID) {
+            //         gameMap[gameID._id] = gameID.gameID;
+            //         gameMap[gameID._id + " 1"] = gameID.creatorID;
+            //         gameMap[gameID._id + " 2"] = gameID.joinedID;
+            //     });
+            // });
             io.to(games).emit('redirect', games);
         });
 
@@ -147,9 +147,7 @@ module.exports = function(app, passport, io) {
             Game.find({}, function(err, gameID){
                 gameID.forEach(function(gameID) {
                     if(gameID.creatorID === personID || gameID.joinedID === personID) {
-                        console.log(gameID.gameID);
-                        var games = gameID.gameID;
-                        io.to(games).emit('emit', games);
+                        io.emit('step', gameID.creatorID, gameID.joinedID);
                         return false
                     }
                 });
@@ -181,4 +179,4 @@ function isLoggedIn(req, res, next) {
         return next();
     // if they aren't redirect them to the home page
     res.redirect('/');
-};
+}

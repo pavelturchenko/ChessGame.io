@@ -8,7 +8,7 @@ a {
     cursor:pointer;
     display: block;
 }
-body.main-page {
+div.main-page {
     height:100vh;
     background: url("../img/main-fon.jpg") no-repeat;
     background-size: 100% 100%;

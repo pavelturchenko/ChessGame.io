@@ -1,30 +1,25 @@
 <!doctype html>
 <html>
 <head>
-    <title>ChessGame</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-    <link rel="stylesheet" href="../css/main.css">
+    <% include partials/head %>
 </head>
-<body class="main-page">
-<div class="container">
+<body>
+<% if (pages === "index") {%>
 
-    <div class="wrapper-main text-center">
-        <h1><span class="fa fa-lock"></span>Hello! If you would like to play chess, you must login or register!</h1>
+    <% include partials/index %>
 
-        <p>Login or Register with:</p>
+<% } else if (pages === "selectGame") {%>
 
-        <a href="/login" class="btn btn-default"><span class="fa fa-user"></span> Login</a>
-        <a href="/signup" class="btn btn-default"><span class="fa fa-user"></span> Signup</a>
-    </div>
-    <div class="start-game">
-        <a href="/selection-game">Начать игру!</a>
-    </div>
-</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="../js/socket.js"></script>
+    <% include partials/selectGame %>
+
+<% }  else if(pages === 'game') {%>
+
+    <% include partials/game %>
+
+<% } %>
+
+<% include partials/footer %>
+
 
 </body>
 </html>

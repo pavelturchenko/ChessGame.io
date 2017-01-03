@@ -3,26 +3,12 @@
  */
 "use strict";
 
-var socket = io(),
-    personID;
-
-function getCookie(name) {
-    var matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-    ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-var creatorSessionID = getCookie('ChessGame');
-var personSessionID = getCookie('persSesID');
-console.log(creatorSessionID);
-console.log(personSessionID);
-
 ;(function(){
     function Game(){
-        Game.player = true;
-        Game.elemClass = "";
+        Game.player = true,
+        Game.elemClass = "",
         Game.buildTable = function(){
-            document.write('<table>');
+            document.write('<table class="chess-board">');
             for (var i = 1; i < 9; i++) {
                 document.write('<tr data-x='+i+'>');
                 for(var j = 1; j < 9; j++){
@@ -44,7 +30,7 @@ console.log(personSessionID);
             }
             document.write('</table>');
             Game.addFigureToBoard();
-        };
+        },
         Game.addFigureToBoard = function() {
             var cells = document.getElementsByTagName('tr');
             for (var i = 0; i < cells.length; i++) {
@@ -67,14 +53,14 @@ console.log(personSessionID);
                 }
 
             }
-        };
+        },
         Game.rowsPawn = function(rows, figureColor){
             for (var j = 0; j < 8; j++) {
                 var span = document.createElement('span');
                 span.className = figureColor + "P";
                 rows[j].appendChild(span);
             }
-        };
+        },
         Game.rowsOldestFigure = function(rows, figureColor){
             for (var j = 0; j < 8; j++) {
                 var span = document.createElement('span');
@@ -99,7 +85,7 @@ console.log(personSessionID);
                     rows[j].appendChild(span);
                 }
             }
-        };
+        }
         Game.buildTable();
     }
 
@@ -107,6 +93,7 @@ console.log(personSessionID);
     window.__games = Game;
 })();
 
-var newGame = __games(creatorSessionID);
+
+
 
 

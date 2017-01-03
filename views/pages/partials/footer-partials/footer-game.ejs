@@ -1,0 +1,22 @@
+<script src="/js/nativeScript.js"></script>
+<script type="text/javascript">
+    var socket = io();
+    var personID = getCookie("personID");
+    socket.emit('step', personID);
+    socket.on('step', function(creatorId, personId){
+        if(personID === personId || personID === creatorId){
+
+        }
+    });
+    var newGame = __games();
+    function getCookie(name) {
+        var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+    $(document).ready(function(){
+        var elem = $('.chess-board')
+        $('body').prepend(elem);
+    })
+</script>

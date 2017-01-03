@@ -34,7 +34,7 @@ table td span.bP {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/black/bP.png) no-repeat;
+	background: url(/img/black/bP.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.bR {
@@ -48,28 +48,28 @@ table td span.bN {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/black/bN.png) no-repeat;
+	background: url(/img/black/bN.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.bB {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/black/bB.png) no-repeat;
+	background: url(/img/black/bB.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.bQ {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/black/bQ.png) no-repeat;
+	background: url(/img/black/bQ.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.bK {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/black/bK.png) no-repeat;
+	background: url(/img/black/bK.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.wP {
@@ -83,35 +83,35 @@ table td span.wR {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/white/wR.png) no-repeat;
+	background: url(/img/white/wR.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.wN {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/white/wN.png) no-repeat;
+	background: url(/img/white/wN.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.wB {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/white/wB.png) no-repeat;
+	background: url(/img/white/wB.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.wQ {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/white/wQ.png) no-repeat;
+	background: url(/img/white/wQ.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.wK {
 	display: block;
 	width: 60px;
 	height: 60px;
-	background: url(../img/white/wK.png) no-repeat;
+	background: url(/img/white/wK.png) no-repeat;
 	background-size: 100% 100%;
 }
 table td span.absol{
