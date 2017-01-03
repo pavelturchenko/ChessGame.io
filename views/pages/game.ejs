@@ -14,19 +14,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="../js/nativeScript.js"></script>
-<script type="text/javascript">
-    var personID = getCookie("personID");
-    socket.emit('step', personID);
 
-    socket.on('step', function(){
-      alert('re-re')
-    });
-    function getCookie(name) {
-        var matches = document.cookie.match(new RegExp(
-            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-    }
-</script>
 </body>
 </html>

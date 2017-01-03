@@ -42,9 +42,6 @@ socket.on('createGame', function(creatorID){
 $(document).on('click', '.newGame', function(){
     var creatorID = $(this).attr('data-creatorid');
     personID = getCookie("personID");
-    if(personID === creatorID) {
-        return false;
-    }
     socket.emit("connectToGame", creatorID, personID);
 });
 
