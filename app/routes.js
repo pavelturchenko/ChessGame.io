@@ -86,7 +86,7 @@ module.exports = function(app, passport, io) {
                 gameListID.forEach(function(gameListID) {
                     gameMap[gameListID._id] = gameListID.gameListID;
                 });
-                io.emit('selectGame', gameMap)
+                io.emit('selectGame', gameMap);
             });
 
         });
@@ -128,14 +128,7 @@ module.exports = function(app, passport, io) {
             newGame.save(function (err, newGame, affected) {
                 if(err) throw err;
             });
-            // var gameMap = {};
-            // Game.find({}, function(err, gameID){
-            //     gameID.forEach(function(gameID) {
-            //         gameMap[gameID._id] = gameID.gameID;
-            //         gameMap[gameID._id + " 1"] = gameID.creatorID;
-            //         gameMap[gameID._id + " 2"] = gameID.joinedID;
-            //     });
-            // });
+
             io.to(games).emit('redirect', games);
         });
 
@@ -143,11 +136,19 @@ module.exports = function(app, passport, io) {
             io.emit('connectServerGame', personSessionID);
         });
 
-        socket.on('step', function(personID){
+        socket.on('connectToGameRoom', function(personID){
             Game.find({}, function(err, gameID){
                 gameID.forEach(function(gameID) {
                     if(gameID.creatorID === personID || gameID.joinedID === personID) {
-                        io.emit('step', gameID.creatorID, gameID.joinedID);
+                        var games = gameID.gameID;
+                        socket.join(games);
+                        if(gameID.creatorID === personID) {
+
+                        }
+                        if(gameID.joinedID=== personID) {
+
+                        }
+                        io.to(games).emit('connectToGameRoom', gameID.creatorID, gameID.joinedID ,games);
                         return false
                     }
                 });
@@ -155,7 +156,6 @@ module.exports = function(app, passport, io) {
         });
 
         socket.on('disconnect', function () {
-            // console.log('user disconnet  -> ' + socket.id)
             var disconnentId = this.id;
             /*Удаляем игру*/
             GameList.find({}, function(err, gameListID){
