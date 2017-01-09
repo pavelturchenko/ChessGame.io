@@ -6,10 +6,10 @@
 ;(function(){
     function Game(colorPlayer){
         this.player = colorPlayer;
-        this.elemClass = "";
         this.buildTable = function(){
             var tableTag = document.createElement('table');
             tableTag.className = 'chess-board';
+            tableTag.setAttribute('id', 'chess-board');
             document.getElementsByClassName('wrap')[0].appendChild(tableTag);
             for (var i = 1; i < 9; i++){
                 var trTag = document.createElement('tr');
@@ -110,16 +110,76 @@
             elem.style.MsTransform = 'rotate('+degree+'deg)';
             elem.style.transform = 'rotate('+degree+'deg)';
         };
-        var self = this;
-
-        document.body.onclick = function(){
-            alert('click')
-        };
         this.buildTable();
+        var self = this;
+        var elem = document.getElementById("chess-board");
+        elem.onclick = function (e) {
+            var event = e || window.event,
+                target = event.target || event.srcElement,
+                targetColor = target.className.slice(0,1);
+            if (self.player === 'white' && targetColor === 'b'){
+                return false;
+            }
+            if (self.player === 'black' && targetColor === 'w'){
+                return false;
+            }
+            self.selectFigure(self, target);
+        }
+
     }
+    Game.prototype.selectFigure = function(self, target){
+        if(target.className === 'wP'){
+            self.calculationPawnMoves(self, target)
+        } else if(target.className === 'wR'){
+
+        } else if(target.className === 'wN'){
+
+        } else if(target.className === 'wB'){
+
+        } else if(target.className === 'wQ'){
+
+        } else if(target.className === 'wK'){
+
+        }
+    };
+    Game.prototype.calculationPawnMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.calculationRookMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.calculationKnightMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.calculationBishopMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.calculationQueenMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.calculationKingMoves = function(self, target){
+        var corsArray = this.readCorsAndRemoveFocus(target);
+        target.className  += ' focus';
+    };
+    Game.prototype.readCorsAndRemoveFocus = function(target){
+        var corX = target.parentNode.parentNode.dataset.x,
+            corY = target.parentNode.dataset.y,
+            chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span');
+        for (var i = 0; i < chessTableSpan.length; i++){
+            chessTableSpan[i].classList.remove('focus');
+        }
+        var corsArray = [corX, corY];
+        return corsArray;
+    };
 
 
     window.__games = Game;
+
 })();
 
 
