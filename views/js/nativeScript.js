@@ -13,7 +13,7 @@
             document.getElementsByClassName('wrap')[0].appendChild(tableTag);
             for (var i = 1; i < 9; i++){
                 var trTag = document.createElement('tr');
-                trTag.setAttribute('data-x', i);
+                trTag.setAttribute('data-y', i);
                 trTag.className = 'rows';
                 document.getElementsByClassName('chess-board')[0].appendChild(trTag);
                 for (var j = 1; j < 9; j++){
@@ -21,22 +21,22 @@
                     if(i % 2 === 0) {
                         if (j % 2 !== 0) {
                             tdTag.className = 'black';
-                            tdTag.setAttribute('data-y', j);
+                            tdTag.setAttribute('data-x', j);
                         } else {
-                            tdTag.setAttribute('data-y', j);
+                            tdTag.setAttribute('data-x', j);
                         }
                     } else {
                         if (j % 2 === 0) {
                             tdTag.className = 'black';
-                            tdTag.setAttribute('data-y', j);
+                            tdTag.setAttribute('data-x', j);
                         } else {
-                            tdTag.setAttribute('data-y', j);
+                            tdTag.setAttribute('data-x', j);
                         }
                     }
                     document.getElementsByClassName('rows')[i - 1].appendChild(tdTag);
                 }
             }
-            if(this.player == 'black'){
+            if(this.player == 'white'){
                 var tableRotate = document.getElementsByTagName('table')[0];
                 this.transformRotate(tableRotate, 180);
             }
@@ -48,22 +48,22 @@
                 var rows;
                 if (i === 0) {
                     rows = cells[i].getElementsByTagName('td');
-                    this.rowsOldestFigure(rows, "b");
+                    this.rowsOldestFigure(rows, "w");
                 }
                 if (i === 1) {
                     rows = cells[i].getElementsByTagName('td');
-                    this.rowsPawn(rows, "b");
+                    this.rowsPawn(rows, "w");
                 }
                 if (i === 6) {
                     rows = cells[i].getElementsByTagName('td');
-                    this.rowsPawn(rows, "w");
+                    this.rowsPawn(rows, "b");
                 }
                 if (i === 7) {
                     rows = cells[i].getElementsByTagName('td');
-                    this.rowsOldestFigure(rows, "w");
+                    this.rowsOldestFigure(rows, "b");
                 }
             }
-            if(this.player == 'black'){
+            if(this.player == 'white'){
                 var spanRotate = document.getElementsByTagName('span');
                 for (var r = 0; r < spanRotate.length; r++){
                     this.transformRotate(spanRotate[r], 180);
@@ -94,11 +94,11 @@
                     rows[j].appendChild(span);
                 }
                 if (j === 3) {
-                    span.className = figureColor + "Q";
+                    span.className = figureColor + "K";
                     rows[j].appendChild(span);
                 }
                 if (j === 4) {
-                    span.className = figureColor + "K";
+                    span.className = figureColor + "Q";
                     rows[j].appendChild(span);
                 }
             }
@@ -128,23 +128,40 @@
 
     }
     Game.prototype.selectFigure = function(self, target){
-        if(target.className === 'wP'){
-            self.calculationPawnMoves(self, target)
-        } else if(target.className === 'wR'){
-
-        } else if(target.className === 'wN'){
-
-        } else if(target.className === 'wB'){
-
-        } else if(target.className === 'wQ'){
-
-        } else if(target.className === 'wK'){
-
+        if(target.className === 'wP' || target.className === 'bP'){
+            self.calculationPawnMoves(self, target);
+        } else if(target.className === 'wR' || target.className === 'wP'){
+            self.calculationRookMoves(self, target);
+        } else if(target.className === 'wN' || target.className === 'bN'){
+            self.calculationKnightMoves(self, target);
+        } else if(target.className === 'wB' || target.className === 'bB'){
+            self.calculationBishopMoves(self, target);
+        } else if(target.className === 'wQ' || target.className === 'bQ'){
+            self.calculationQueenMoves(self, target);
+        } else if(target.className === 'wK' || target.className === 'bK'){
+            self.calculationKingMoves(self, target);
         }
     };
     Game.prototype.calculationPawnMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = self.readCorsAndRemoveFocus(target);
         target.className  += ' focus';
+        var mathSymbol;
+        if(self.player === 'white'){
+            mathSymbol = '+' ;
+        }  else {
+            mathSymbol = '-' ;
+        }
+        console.log(corsArray);
+        var corsY = Number(corsArray[1]) + 1,
+            corsX = Number(corsArray[1]),
+            chessTableTrGo = document.querySelector('[data-y="'+  corsY +'"]');
+            // chessTableTrGo = chessTableTrGo.children('td');
+            // chessTableTdGo = chessTableTrGo;
+        console.log(typeof chessTableTrGo);
+        console.log(chessTableTrGo);
+        if(corsArray[1] === '7' || corsArray[1] === '2') {
+
+        }
     };
     Game.prototype.calculationRookMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(target);
@@ -167,8 +184,8 @@
         target.className  += ' focus';
     };
     Game.prototype.readCorsAndRemoveFocus = function(target){
-        var corX = target.parentNode.parentNode.dataset.x,
-            corY = target.parentNode.dataset.y,
+        var corY = target.parentNode.parentNode.dataset.y,
+            corX = target.parentNode.dataset.x,
             chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span');
         for (var i = 0; i < chessTableSpan.length; i++){
             chessTableSpan[i].classList.remove('focus');
