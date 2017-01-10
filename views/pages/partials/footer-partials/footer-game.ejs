@@ -5,7 +5,7 @@
         colorPlayer = "",
         room = "";
     socket.emit('connectToGameRoom', personID);
-    socket.on('connectToGameRoom', function(creatorId, personId, roomNumber){
+    socket.on('connectToGameRoom', function (creatorId, personId, roomNumber){
         room = roomNumber;
         if (colorPlayer !== '') {
             return false
@@ -17,8 +17,17 @@
                 colorPlayer = 'white';
             }
             var newGame = new __games(colorPlayer);
-
         }
+    });
+    socket.on('stepToGo', function(cordsArray){
+        console.log(cordsArray)
+        var corXParent = Number(cordsArray[0]),
+            corYParent = Number(cordsArray[1]),
+            corXChild = Number(cordsArray[2]),
+            corYChild = Number(cordsArray[3]),
+            target = document.querySelector('[data-y="'+  corYParent +'"] > td[data-x="'+  corXParent +'"]'),
+            elem = document.querySelector('[data-y="'+  corYChild +'"] > td[data-x="'+  corXChild +'"] > span');
+        target.appendChild(elem);
     });
 
     function getCookie(name) {

@@ -6,6 +6,7 @@
 ;(function(){
     function Game(colorPlayer){
         this.player = colorPlayer;
+        this.walketh = "white";
         this.buildTable = function(){
             var tableTag = document.createElement('table');
             tableTag.className = 'chess-board';
@@ -116,14 +117,19 @@
         elem.onclick = function (e) {
             var event = e || window.event,
                 target = event.target || event.srcElement,
-                targetColor = target.className.slice(0,1);
-            if (self.player === 'white' && targetColor === 'b'){
+                targetColor = target.className.slice(0,1),
+                targetParents = target.parentNode.className;
+            if (self.player === 'white' && targetColor === 'b' && targetParents !== 'rows'){
                 return false;
             }
-            if (self.player === 'black' && targetColor === 'w'){
+            if (self.player === 'black' && targetColor === 'w' && targetParents !== 'rows'){
                 return false;
             }
-            self.selectFigure(self, target);
+            if(targetParents !== 'rows') {
+                self.selectFigure(self, target);
+            } else {
+                self.goOrKillMove(self, target);
+            }
         }
 
     }
@@ -143,55 +149,114 @@
         }
     };
     Game.prototype.calculationPawnMoves = function(self, target){
-        var corsArray = self.readCorsAndRemoveFocus(target);
+        var corsArray = self.readCorsAndRemoveFocus(self, target),
+            corsY,
+            corsX,
+            corsXKillLeft = Number(corsArray[0]) + 1,
+            corsXKillRight = Number(corsArray[0]) - 1;
         target.className  += ' focus';
-        var mathSymbol;
-        if(self.player === 'white'){
-            mathSymbol = '+' ;
-        }  else {
-            mathSymbol = '-' ;
-        }
-        console.log(corsArray);
-        var corsY = Number(corsArray[1]) + 1,
-            corsX = Number(corsArray[1]),
-            chessTableTrGo = document.querySelector('[data-y="'+  corsY +'"]');
-            // chessTableTrGo = chessTableTrGo.children('td');
-            // chessTableTdGo = chessTableTrGo;
-        console.log(typeof chessTableTrGo);
-        console.log(chessTableTrGo);
-        if(corsArray[1] === '7' || corsArray[1] === '2') {
-
+        if(self.player === self.walketh){
+            corsY = Number(corsArray[1]) + 1;
+            corsX = Number(corsArray[0]);
+            self.addClassGo(corsY, corsX);
+            self.addClassKill(self, corsY, corsXKillLeft, corsXKillRight);
+            if(corsArray[1] === '2') {
+                corsY = Number(corsArray[1]) + 2;
+                self.addClassGo(corsY, corsX);
+            }
+        }  else if(self.player === self.walketh){
+            corsY = Number(corsArray[1]) - 1;
+            corsX = Number(corsArray[0]);
+            self.addClassGo(corsY, corsX);
+            self.addClassKill(self, corsY, corsXKillLeft, corsXKillRight);
+            if(corsArray[1] === '7') {
+                corsY = Number(corsArray[1]) - 2;
+                self.addClassGo(corsY, corsX);
+            }
         }
     };
     Game.prototype.calculationRookMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
     Game.prototype.calculationKnightMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
     Game.prototype.calculationBishopMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
     Game.prototype.calculationQueenMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
     Game.prototype.calculationKingMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(target);
+        var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
-    Game.prototype.readCorsAndRemoveFocus = function(target){
+    Game.prototype.readCorsAndRemoveFocus = function(self, target){
         var corY = target.parentNode.parentNode.dataset.y,
             corX = target.parentNode.dataset.x,
-            chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span');
+            corsArray = [corX, corY];
+        self.cleanTdAndSpan();
+        return corsArray;
+    };
+    Game.prototype.cleanTdAndSpan = function() {
+        var chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span'),
+            chessTableTd = document.getElementById('chess-board').getElementsByTagName('td');
         for (var i = 0; i < chessTableSpan.length; i++){
             chessTableSpan[i].classList.remove('focus');
         }
-        var corsArray = [corX, corY];
-        return corsArray;
+        for (var i = 0; i < chessTableTd.length; i++){
+            chessTableTd[i].classList.remove('go');
+            chessTableTd[i].classList.remove('kill');
+        }
+    };
+    Game.prototype.addClassGo = function(corsY, corsX) {
+        var chessTableTrGo = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+        if(chessTableTrGo.childNodes.length === 0) {
+            chessTableTrGo.className += ' go';
+        }
+    };
+    Game.prototype.addClassKill = function(self, corsY, corsXKillLeft, corsXKillRight){
+        var chessTableTrKill = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsXKillLeft +'"] > span');
+        if(chessTableTrKill !== null && ((self.player === 'white' && chessTableTrKill.className.slice(0,1) === 'b') || (self.player === 'black' && chessTableTrKill.className.slice(0,1) === 'w'))){
+            chessTableTrKill = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsXKillLeft +'"]');
+            chessTableTrKill.className += ' kill';
+        }
+        chessTableTrKill = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsXKillRight +'"] > span');
+        if(chessTableTrKill !== null && ((self.player === 'white' && chessTableTrKill.className.slice(0,1) === 'b') || (self.player === 'black' && chessTableTrKill.className.slice(0,1) === 'w'))){
+            chessTableTrKill = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsXKillRight +'"]');
+            chessTableTrKill.className += ' kill';
+        }
+    };
+    Game.prototype.goOrKillMove = function(self, target){
+        if(target.classList.contains('go')){
+           self.goMove(self, target);
+        } else if(target.classList.contains('kill')){
+            self.killMove();
+        }
+    };
+    Game.prototype.goMove = function(self, target) {
+       var elem = document.querySelector('.focus'),
+           cordsArray = [];
+        cordsArray[0] = target.dataset.x;
+        cordsArray[1] = target.parentNode.dataset.y;
+        cordsArray[2] = elem.parentNode.dataset.x;
+        cordsArray[3] = elem.parentNode.parentNode.dataset.y;
+       target.appendChild(elem);
+       self.cleanTdAndSpan();
+       socket.emit('stepToGo', cordsArray, personID);
+       if(self.walketh === "white") {
+           self.walketh = 'black';
+       } else {
+           self.walketh = 'white';
+       }
+       console.log(self.walketh)
+    };
+    Game.prototype.killMove = function(self, target) {
+
     };
 
 

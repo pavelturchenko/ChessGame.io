@@ -154,7 +154,17 @@ module.exports = function(app, passport, io) {
                 });
             });
         });
-
+        socket.on('stepToGo', function(cordsArray, personID){
+            Game.find({}, function(err, gameID){
+                gameID.forEach(function(gameID) {
+                    if(gameID.creatorID === personID ) {
+                        var games = gameID.gameID;
+                        socket.broadcast.to(games).emit('stepToGo', cordsArray);
+                        return false
+                    }
+                });
+            });
+        });
         socket.on('disconnect', function () {
             var disconnentId = this.id;
             /*Удаляем игру*/
@@ -167,7 +177,7 @@ module.exports = function(app, passport, io) {
                         gameMap[gameListID._id] = gameListID.gameListID;
                     }
                 });
-                io.emit('disconnectServer', gameMap)
+                io.emit('disconnectServer', gameMap);
             });
         })
     });

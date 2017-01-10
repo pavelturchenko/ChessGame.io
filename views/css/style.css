@@ -1,7 +1,7 @@
 @charset "utf-8";
 table {
-	width: 500px;
-	height: 500px;
+	width: 490px;
+	height: 490px;
 	border: 1px solid #000;
 	border-collapse: collapse;
 	position: relative;
@@ -17,12 +17,12 @@ table tr {
 table td {
 	border: 1px solid #000;
 	background: #d8a459;
-	position: relative;
 	z-index: 1;
 	box-sizing: border-box;
 	padding: 0;
-	width:60px;
-	height:60px;
+	width:59px;
+	height:59px;
+	position: relative;
 }
 table td.black {
 	background: #8b4e21;
@@ -121,10 +121,8 @@ table td span.absol{
 	max-height: 62px;
 }
 table td span.focus{
-	position: relative;
-	z-index: 4;
-	max-width: 62px;
-	max-height: 62px;
+	width: 60px;
+	height: 60px;
 	box-shadow: inset 0 0 15px rgba(80,255,0,0.75);
 }
 table td.kill span{
