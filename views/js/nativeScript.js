@@ -4,9 +4,8 @@
 "use strict";
 
 ;(function(){
-    function Game(colorPlayer){
+    function Game(colorPlayer, figurePosition){
         this.player = colorPlayer;
-        this.walketh = "white";
         this.buildTable = function(){
             var tableTag = document.createElement('table');
             tableTag.className = 'chess-board';
@@ -41,29 +40,39 @@
                 var tableRotate = document.getElementsByTagName('table')[0];
                 this.transformRotate(tableRotate, 180);
             }
-            this.addFigureToBoard();
+            this.addFigureToBoard(figurePosition);
         };
-        this.addFigureToBoard = function() {
-            var cells = document.getElementsByTagName('tr');
-            for (var i = 0; i < cells.length; i++) {
-                var rows;
-                if (i === 0) {
-                    rows = cells[i].getElementsByTagName('td');
-                    this.rowsOldestFigure(rows, "w");
-                }
-                if (i === 1) {
-                    rows = cells[i].getElementsByTagName('td');
-                    this.rowsPawn(rows, "w");
-                }
-                if (i === 6) {
-                    rows = cells[i].getElementsByTagName('td');
-                    this.rowsPawn(rows, "b");
-                }
-                if (i === 7) {
-                    rows = cells[i].getElementsByTagName('td');
-                    this.rowsOldestFigure(rows, "b");
+        this.addFigureToBoard = function(figurePosition) {
+            for (var colorName in figurePosition) {
+                for (var figureName in figurePosition[colorName]) {
+                    var parentTd = document.querySelector('[data-y = "'+ figurePosition[colorName][figureName][0] +'"] > [data-x = "'+ figurePosition[colorName][figureName][1] +'"]')
+                    var elem = document.createElement('span');
+                    elem.className = figurePosition[colorName][figureName][2];
+                    elem.setAttribute('data-figurename', figureName);
+                    parentTd.appendChild(elem);
                 }
             }
+
+            // var cells = document.getElementsByTagName('tr');
+            // for (var i = 0; i < cells.length; i++) {
+            //     var rows;
+            //     if (i === 0) {
+            //         rows = cells[i].getElementsByTagName('td');
+            //         this.rowsOldestFigure(rows, "w");
+            //     }
+            //     if (i === 1) {
+            //         rows = cells[i].getElementsByTagName('td');
+            //         this.rowsPawn(rows, "w");
+            //     }
+            //     if (i === 6) {
+            //         rows = cells[i].getElementsByTagName('td');
+            //         this.rowsPawn(rows, "b");
+            //     }
+            //     if (i === 7) {
+            //         rows = cells[i].getElementsByTagName('td');
+            //         this.rowsOldestFigure(rows, "b");
+            //     }
+            // }
             if(this.player == 'white'){
                 var spanRotate = document.getElementsByTagName('span');
                 for (var r = 0; r < spanRotate.length; r++){
@@ -153,9 +162,11 @@
             corsY,
             corsX,
             corsXKillLeft = Number(corsArray[0]) + 1,
-            corsXKillRight = Number(corsArray[0]) - 1;
+            corsXKillRight = Number(corsArray[0]) - 1,
+            walker = document.body.classList.contains('white');
         target.className  += ' focus';
-        if(self.player === self.walketh){
+
+        if(self.player === 'white' && walker){
             corsY = Number(corsArray[1]) + 1;
             corsX = Number(corsArray[0]);
             self.addClassGo(corsY, corsX);
@@ -164,7 +175,7 @@
                 corsY = Number(corsArray[1]) + 2;
                 self.addClassGo(corsY, corsX);
             }
-        }  else if(self.player === self.walketh){
+        }  else if(self.player === 'black' && !walker){
             corsY = Number(corsArray[1]) - 1;
             corsX = Number(corsArray[0]);
             self.addClassGo(corsY, corsX);
@@ -245,21 +256,21 @@
         cordsArray[1] = target.parentNode.dataset.y;
         cordsArray[2] = elem.parentNode.dataset.x;
         cordsArray[3] = elem.parentNode.parentNode.dataset.y;
+        cordsArray[4] = elem.getAttribute('data-figurename');
        target.appendChild(elem);
        self.cleanTdAndSpan();
-       socket.emit('stepToGo', cordsArray, personID);
-       if(self.walketh === "white") {
-           self.walketh = 'black';
-       } else {
-           self.walketh = 'white';
-       }
-       console.log(self.walketh)
+       var walker = document.body.classList.contains("white");
+       if(walker) {
+            walker = 'black';
+        } else {
+           walker = 'white';
+        }
+       socket.emit('stepToGo', cordsArray, personID, walker);
+
     };
     Game.prototype.killMove = function(self, target) {
 
     };
-
-
     window.__games = Game;
 
 })();

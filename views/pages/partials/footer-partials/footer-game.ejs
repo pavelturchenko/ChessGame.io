@@ -5,8 +5,9 @@
         colorPlayer = "",
         room = "";
     socket.emit('connectToGameRoom', personID);
-    socket.on('connectToGameRoom', function (creatorId, personId, roomNumber){
+    socket.on('connectToGameRoom', function (creatorId, personId, roomNumber, walker, figurePosition){
         room = roomNumber;
+
         if (colorPlayer !== '') {
             return false
         } else {
@@ -16,8 +17,10 @@
             if (personID === creatorId) {
                 colorPlayer = 'white';
             }
-            var newGame = new __games(colorPlayer);
+            document.body.className += " " + walker;
+            var newGame = new __games(colorPlayer, figurePosition);
         }
+
     });
     socket.on('stepToGo', function(cordsArray){
         console.log(cordsArray)
