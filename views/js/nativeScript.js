@@ -45,71 +45,17 @@
         this.addFigureToBoard = function(figurePosition) {
             for (var colorName in figurePosition) {
                 for (var figureName in figurePosition[colorName]) {
-                    var parentTd = document.querySelector('[data-y = "'+ figurePosition[colorName][figureName][0] +'"] > [data-x = "'+ figurePosition[colorName][figureName][1] +'"]')
+                    var parentTd = document.querySelector('[data-y = "'+ Number(figurePosition[colorName][figureName][0]) +'"] > [data-x = "'+ Number(figurePosition[colorName][figureName][1]) +'"]')
                     var elem = document.createElement('span');
                     elem.className = figurePosition[colorName][figureName][2];
                     elem.setAttribute('data-figurename', figureName);
                     parentTd.appendChild(elem);
                 }
             }
-
-            // var cells = document.getElementsByTagName('tr');
-            // for (var i = 0; i < cells.length; i++) {
-            //     var rows;
-            //     if (i === 0) {
-            //         rows = cells[i].getElementsByTagName('td');
-            //         this.rowsOldestFigure(rows, "w");
-            //     }
-            //     if (i === 1) {
-            //         rows = cells[i].getElementsByTagName('td');
-            //         this.rowsPawn(rows, "w");
-            //     }
-            //     if (i === 6) {
-            //         rows = cells[i].getElementsByTagName('td');
-            //         this.rowsPawn(rows, "b");
-            //     }
-            //     if (i === 7) {
-            //         rows = cells[i].getElementsByTagName('td');
-            //         this.rowsOldestFigure(rows, "b");
-            //     }
-            // }
             if(this.player == 'white'){
                 var spanRotate = document.getElementsByTagName('span');
                 for (var r = 0; r < spanRotate.length; r++){
                     this.transformRotate(spanRotate[r], 180);
-                }
-            }
-
-        };
-        this.rowsPawn = function(rows, figureColor){
-            for (var j = 0; j < 8; j++) {
-                var span = document.createElement('span');
-                span.className = figureColor + "P";
-                rows[j].appendChild(span);
-            }
-        };
-        this.rowsOldestFigure = function(rows, figureColor){
-            for (var j = 0; j < 8; j++) {
-                var span = document.createElement('span');
-                if (j === 0 || j === 7) {
-                    span.className = figureColor + "R";
-                    rows[j].appendChild(span);
-                }
-                if (j === 1 || j === 6) {
-                    span.className = figureColor + "N";
-                    rows[j].appendChild(span);
-                }
-                if (j === 2 || j === 5) {
-                    span.className = figureColor + "B";
-                    rows[j].appendChild(span);
-                }
-                if (j === 3) {
-                    span.className = figureColor + "K";
-                    rows[j].appendChild(span);
-                }
-                if (j === 4) {
-                    span.className = figureColor + "Q";
-                    rows[j].appendChild(span);
                 }
             }
         };
@@ -145,7 +91,7 @@
     Game.prototype.selectFigure = function(self, target){
         if(target.className === 'wP' || target.className === 'bP'){
             self.calculationPawnMoves(self, target);
-        } else if(target.className === 'wR' || target.className === 'wP'){
+        } else if(target.className === 'wR' || target.className === 'bR'){
             self.calculationRookMoves(self, target);
         } else if(target.className === 'wN' || target.className === 'bN'){
             self.calculationKnightMoves(self, target);
@@ -187,16 +133,30 @@
         }
     };
     Game.prototype.calculationRookMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(self, target);
-        target.className  += ' focus';
+        var corsArray = this.readCorsAndRemoveFocus(self, target),
+            walker = document.body.classList.contains('white');
+        if(self.player === 'white' && walker) {
+            target.className  += ' focus';
+            self.moveRookAndForwardMoveQueen(self, corsArray, 'white');
+        } else if(self.player === 'black' && !walker) {
+            target.className  += ' focus';
+            self.moveRookAndForwardMoveQueen(self, corsArray, 'black');
+        }
     };
     Game.prototype.calculationKnightMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
     };
     Game.prototype.calculationBishopMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(self, target);
-        target.className  += ' focus';
+        var corsArray = this.readCorsAndRemoveFocus(self, target),
+            walker = document.body.classList.contains('white');
+        if(self.player === 'white' && walker) {
+            target.className  += ' focus';
+            self.moveBishopAndForwardMoveQueen(self, corsArray, 'white');
+        } else if(self.player === 'black' && !walker) {
+            target.className  += ' focus';
+            self.moveBishopAndForwardMoveQueen(self, corsArray, 'black');
+        }
     };
     Game.prototype.calculationQueenMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target);
@@ -205,6 +165,145 @@
     Game.prototype.calculationKingMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target);
         target.className  += ' focus';
+    };
+    Game.prototype.moveRookAndForwardMoveQueen = function(self, corsArray, colorFigure) {
+        var elem,
+            i,
+            corsY,
+            corsX;
+        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
+            corsY = i;
+            corsX = Number(corsArray[0]);
+            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    break;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
+            corsY = i;
+            corsX = Number(corsArray[0]);
+            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    break;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+        for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
+            corsY = Number(corsArray[1]);
+            corsX = i;
+            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    break;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+        for ( i = Number(corsArray[0]) - 1; i >= 0; i-- ){
+            corsY = Number(corsArray[1]);
+            corsX = i;
+            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    break;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+    };
+    Game.prototype.moveBishopAndForwardMoveQueen = function(self, corsArray, colorFigure) {
+        var elem,
+            i,
+            returnBishopSteps,
+            corsY,
+            corsX,
+            diferent;
+
+        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
+            diferent = i - Number(corsArray[1]);
+            corsY = i;
+            corsX = Number(corsArray[0]) + diferent;
+            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
+            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
+                break;
+            }
+        }
+        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
+            diferent = i - Number(corsArray[1]);
+            corsY = i;
+            corsX = Number(corsArray[0]) - diferent;
+            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
+            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
+                break;
+            }
+        }
+        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
+            diferent = i - Number(corsArray[1]);
+            corsY = i;
+            corsX = Number(corsArray[0]) + diferent;
+            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
+            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
+                break;
+            }
+        }
+        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
+            diferent = i - Number(corsArray[1]);
+            corsY = i;
+            corsX = Number(corsArray[0]) - diferent;
+            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
+            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
+                break;
+            }
+        }
+        function bishopSteps(corsY, corsX, colorFigure){
+            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    return false;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        }
     };
     Game.prototype.readCorsAndRemoveFocus = function(self, target){
         var corY = target.parentNode.parentNode.dataset.y,
@@ -219,9 +318,9 @@
         for (var i = 0; i < chessTableSpan.length; i++){
             chessTableSpan[i].classList.remove('focus');
         }
-        for (var i = 0; i < chessTableTd.length; i++){
-            chessTableTd[i].classList.remove('go');
-            chessTableTd[i].classList.remove('kill');
+        for (var j = 0; j < chessTableTd.length; j++){
+            chessTableTd[j].classList.remove('go');
+            chessTableTd[j].classList.remove('kill');
         }
     };
     Game.prototype.addClassGo = function(corsY, corsX) {
@@ -262,21 +361,17 @@
        var walker = document.body.classList.contains("white");
        if(walker) {
             walker = 'black';
+           document.body.classList.remove("white");
+           document.body.classList.add("black");
         } else {
            walker = 'white';
+           document.body.classList.remove("black");
+           document.body.classList.add("white");
         }
        socket.emit('stepToGo', cordsArray, personID, walker);
-
     };
     Game.prototype.killMove = function(self, target) {
 
     };
     window.__games = Game;
-
 })();
-
-
-
-
-
-

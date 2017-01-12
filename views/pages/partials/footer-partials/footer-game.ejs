@@ -22,8 +22,7 @@
         }
 
     });
-    socket.on('stepToGo', function(cordsArray){
-        console.log(cordsArray)
+    socket.on('stepToGo', function(walker, cordsArray){
         var corXParent = Number(cordsArray[0]),
             corYParent = Number(cordsArray[1]),
             corXChild = Number(cordsArray[2]),
@@ -31,6 +30,13 @@
             target = document.querySelector('[data-y="'+  corYParent +'"] > td[data-x="'+  corXParent +'"]'),
             elem = document.querySelector('[data-y="'+  corYChild +'"] > td[data-x="'+  corXChild +'"] > span');
         target.appendChild(elem);
+        if(walker === "white"){
+            document.body.classList.remove("black");
+            document.body.classList.add("white");
+        } else {
+            document.body.classList.remove("white");
+            document.body.classList.add("black");
+        }
     });
 
     function getCookie(name) {

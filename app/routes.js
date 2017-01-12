@@ -200,49 +200,40 @@ module.exports = function (app, passport, io) {
                         for (var colorName in newFigurePosition) {
                             if(colorName === "white" && colorName != walker){
                                 for (var figureName in newFigurePosition[colorName]) {
-                                    console.log('white    !')
-                                    /*найти и перезаписать нужный элемент*/
+                                    if(figureName == cordsName){
+                                        newFigurePosition[colorName][figureName][0] = cordsArray[1];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[2];
+                                        Game.update({creatorID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
                                 }
                             } else if(colorName === "black" && colorName != walker){
                                 for (var figureName in newFigurePosition[colorName]) {
-                                    console.log('black    !')
-                                    /*найти и перезаписать нужный элемент*/
+                                    if(figureName == cordsName){
+                                        newFigurePosition[colorName][figureName][0] = cordsArray[1];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[2];
+                                        Game.update({joinedID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
                                 }
                             }
 
                         }
-
-
-                        return false;
-                    }
-                });
-            });
-
-            // Game.update({creatorID: personID}, {
-            //     walker: walker,
-            //     // figurePosition: {
-            //     //     white: {
-            //     //         cordsName: [8, 8]
-            //     //     }
-            //     // }
-            // }, function (err, numberAffected, rawResponse) {
-            //
-            // });
-            Game.find({}, function (err, gameID) {
-                gameID.forEach(function (gameID) {
-                    if (gameID.creatorID === personID) {
-                        console.log(gameID.creatorID);
-                        console.log(gameID.joinedID);
-                        console.log(gameID.figurePosition);
-                        console.log(gameID.walker);
+                        var games = gameID.gameID;
+                        socket.broadcast.to(games).emit('stepToGo', walker, cordsArray);
                         return false
                     }
                 });
             });
+
         });
         socket.on('disconnect', function () {
             var disconnentId = this.id;
-            /*Удаляем игру*/
+            /*Удаляем игру из списка*/
             GameList.find({}, function (err, gameListID) {
                 var gameMap = {};
                 gameListID.forEach(function (gameListID) {
