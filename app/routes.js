@@ -202,7 +202,7 @@ module.exports = function (app, passport, io) {
                                 for (var figureName in newFigurePosition[colorName]) {
                                     if(figureName == cordsName){
                                         newFigurePosition[colorName][figureName][0] = cordsArray[1];
-                                        newFigurePosition[colorName][figureName][1] = cordsArray[2];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[0];
                                         Game.update({creatorID: personID}, {
                                             walker: walker,
                                             figurePosition: newFigurePosition
@@ -213,7 +213,7 @@ module.exports = function (app, passport, io) {
                                 for (var figureName in newFigurePosition[colorName]) {
                                     if(figureName == cordsName){
                                         newFigurePosition[colorName][figureName][0] = cordsArray[1];
-                                        newFigurePosition[colorName][figureName][1] = cordsArray[2];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[0];
                                         Game.update({joinedID: personID}, {
                                             walker: walker,
                                             figurePosition: newFigurePosition
@@ -231,6 +231,10 @@ module.exports = function (app, passport, io) {
             });
 
         });
+        socket.on('stepToKill', function (cordsArray, personID, walker) {
+
+        });
+
         socket.on('disconnect', function () {
             var disconnentId = this.id;
             /*Удаляем игру из списка*/

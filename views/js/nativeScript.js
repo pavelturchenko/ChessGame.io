@@ -75,10 +75,18 @@
                 targetColor = target.className.slice(0,1),
                 targetParents = target.parentNode.className;
             if (self.player === 'white' && targetColor === 'b' && targetParents !== 'rows'){
-                return false;
+                if(target.parentElement.classList.contains('kill')){
+                    self.goOrKillMove(self, target);
+                } else {
+                    return false;
+                }
             }
             if (self.player === 'black' && targetColor === 'w' && targetParents !== 'rows'){
-                return false;
+                if(target.parentElement.classList.contains('kill')){
+                    self.goOrKillMove(self, target);
+                } else {
+                    return false;
+                }
             }
             if(targetParents !== 'rows') {
                 self.selectFigure(self, target);
@@ -106,6 +114,7 @@
     Game.prototype.calculationPawnMoves = function(self, target){
         var corsArray = self.readCorsAndRemoveFocus(self, target),
             corsY,
+            corsY2,
             corsX,
             corsXKillLeft = Number(corsArray[0]) + 1,
             corsXKillRight = Number(corsArray[0]) - 1,
@@ -119,7 +128,8 @@
             self.addClassKill(self, corsY, corsXKillLeft, corsXKillRight);
             if(corsArray[1] === '2') {
                 corsY = Number(corsArray[1]) + 2;
-                self.addClassGo(corsY, corsX);
+                corsY2 = Number(corsArray[1]) + 1;
+                self.addClassGo(corsY, corsX, 'doubleStep', corsY2);
             }
         }  else if(self.player === 'black' && !walker){
             corsY = Number(corsArray[1]) - 1;
@@ -128,7 +138,8 @@
             self.addClassKill(self, corsY, corsXKillLeft, corsXKillRight);
             if(corsArray[1] === '7') {
                 corsY = Number(corsArray[1]) - 2;
-                self.addClassGo(corsY, corsX);
+                corsY2 = Number(corsArray[1]) - 1;
+                self.addClassGo(corsY, corsX, 'doubleStep', corsY2);
             }
         }
     };
@@ -144,8 +155,138 @@
         }
     };
     Game.prototype.calculationKnightMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(self, target);
-        target.className  += ' focus';
+        var corsArray = this.readCorsAndRemoveFocus(self, target),
+            corsX = Number(corsArray[0]),
+            corsY = Number(corsArray[1]),
+            walker = document.body.classList.contains('white');
+
+        if(self.player === 'white' && walker) {
+            target.className  += ' focus';
+            knightMoveTop(corsX, corsY, 'white');
+            knightMoveBottom(corsX, corsY, 'white');
+            knightMoveLeft(corsX, corsY, 'white');
+            knightMoveRight(corsX, corsY, 'white');
+        } else if(self.player === 'black' && !walker) {
+            target.className  += ' focus';
+            knightMoveTop(corsX, corsY, 'black');
+            knightMoveBottom(corsX, corsY, 'black');
+            knightMoveLeft(corsX, corsY, 'black');
+            knightMoveRight(corsX, corsY, 'black');
+        }
+
+        function knightMoveTop(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            if(colorFigure === 'white'){
+                parentXCors = corsX + 1;
+                parentYCors = corsY + 2;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            } else {
+                parentXCors = corsX + 1;
+                parentYCors = corsY - 2;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            }
+        }
+        function knightMoveBottom(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            if(colorFigure === 'black'){
+                parentXCors = corsX + 1;
+                parentYCors = corsY + 2;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            } else {
+                parentXCors = corsX + 1;
+                parentYCors = corsY - 2;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            }
+        }
+        function knightMoveLeft(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+
+            if(colorFigure === 'white'){
+                parentXCors = corsX + 2;
+                parentYCors = corsY + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsY - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            } else {
+                parentXCors = corsX - 2;
+                parentYCors = corsY + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            }
+        }
+        function knightMoveRight(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+
+            if(colorFigure === 'white'){
+                parentXCors = corsX + 2;
+                parentYCors = corsY + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsY - 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            } else {
+                parentXCors = corsX - 2;
+                parentYCors = corsY + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+
+                parentXCors = corsX + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+            }
+        }
+        function elemInspection(elem, colorFigure){
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    return false;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        }
     };
     Game.prototype.calculationBishopMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
@@ -159,12 +300,99 @@
         }
     };
     Game.prototype.calculationQueenMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(self, target);
-        target.className  += ' focus';
+        var corsArray = this.readCorsAndRemoveFocus(self, target),
+            walker = document.body.classList.contains('white');
+        if(self.player === 'white' && walker) {
+            target.className  += ' focus';
+            self.moveRookAndForwardMoveQueen(self, corsArray, 'white');
+            self.moveBishopAndForwardMoveQueen(self, corsArray, 'white');
+        } else if(self.player === 'black' && !walker) {
+            target.className  += ' focus';
+            self.moveRookAndForwardMoveQueen(self, corsArray, 'black');
+            self.moveBishopAndForwardMoveQueen(self, corsArray, 'black');
+        }
     };
     Game.prototype.calculationKingMoves = function(self, target){
-        var corsArray = this.readCorsAndRemoveFocus(self, target);
-        target.className  += ' focus';
+        var corsArray = this.readCorsAndRemoveFocus(self, target),
+            corsX = Number(corsArray[0]),
+            corsY = Number(corsArray[1]),
+            walker = document.body.classList.contains('white');
+        if(self.player === 'white' && walker) {
+            target.className  += ' focus';
+            knightMoveTop(corsX, corsY, 'white');
+            knightMoveBottom(corsX, corsY, 'white');
+            knightMoveLeft(corsX, corsY, 'white');
+            knightMoveRight(corsX, corsY, 'white');
+        } else if(self.player === 'black' && !walker) {
+            target.className  += ' focus';
+            knightMoveTop(corsX, corsY, 'black');
+            knightMoveBottom(corsX, corsY, 'black');
+            knightMoveLeft(corsX, corsY, 'black');
+            knightMoveRight(corsX, corsY, 'black');
+        }
+        function knightMoveTop(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            parentXCors = corsX + 1;
+            parentYCors = corsY + 1;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+            parentXCors = corsX - 1;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+            parentXCors = corsX;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+        }
+        function knightMoveBottom(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            parentXCors = corsX + 1;
+            parentYCors = corsY - 1;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+            parentXCors = corsX - 1;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+            parentXCors = corsX;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+        }
+        function knightMoveLeft(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            parentXCors = corsX + 1;
+            parentYCors = corsY;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+        }
+        function knightMoveRight(corsX, corsY, colorFigure) {
+            var parentXCors,
+                parentYCors,
+                elem;
+            parentXCors = corsX - 1;
+            parentYCors = corsY;
+            elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+            elemInspection(elem, colorFigure);
+        }
+        function elemInspection(elem, colorFigure){
+            if(elem != null && elem.childNodes.length === 0){
+                elem.className += " go";
+            } else if(elem != null && elem.childNodes.length !== 0){
+                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                    elem.className += " kill";
+                    return false;
+                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                    elem.className += " kill";
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+        }
     };
     Game.prototype.moveRookAndForwardMoveQueen = function(self, corsArray, colorFigure) {
         var elem,
@@ -175,71 +403,50 @@
             corsY = i;
             corsX = Number(corsArray[0]);
             elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
-            } else if(elem != null && elem.childNodes.length !== 0){
-                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
-                    elem.className += " kill";
-                    break;
-                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
-                    elem.className += " kill";
-                    break;
-                } else {
-                    break;
-                }
+            var stopCycle = elemInspection(elem);
+            if(stopCycle === false){
+                break;
             }
         }
         for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
             corsY = i;
             corsX = Number(corsArray[0]);
             elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
-            } else if(elem != null && elem.childNodes.length !== 0){
-                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
-                    elem.className += " kill";
-                    break;
-                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
-                    elem.className += " kill";
-                    break;
-                } else {
-                    break;
-                }
+            var stopCycle = elemInspection(elem);
+            if(stopCycle === false){
+                break;
             }
         }
         for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
             corsY = Number(corsArray[1]);
             corsX = i;
             elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
-            } else if(elem != null && elem.childNodes.length !== 0){
-                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
-                    elem.className += " kill";
-                    break;
-                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
-                    elem.className += " kill";
-                    break;
-                } else {
-                    break;
-                }
+            var stopCycle = elemInspection(elem);
+            if(stopCycle === false){
+                break;
             }
         }
         for ( i = Number(corsArray[0]) - 1; i >= 0; i-- ){
             corsY = Number(corsArray[1]);
             corsX = i;
             elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+            var stopCycle = elemInspection(elem);
+            if(stopCycle === false){
+                break;
+            }
+        }
+        function elemInspection(elem){
             if(elem != null && elem.childNodes.length === 0){
                 elem.className += " go";
             } else if(elem != null && elem.childNodes.length !== 0){
                 if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
                     elem.className += " kill";
-                    break;
+                    return false;
                 } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
                     elem.className += " kill";
-                    break;
+                    return false;
                 } else {
-                    break;
+                    return false;
                 }
             }
         }
@@ -323,8 +530,17 @@
             chessTableTd[j].classList.remove('kill');
         }
     };
-    Game.prototype.addClassGo = function(corsY, corsX) {
-        var chessTableTrGo = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
+    Game.prototype.addClassGo = function(corsY, corsX , doubleStep, corsY2) {
+        var chessTableTrGo;
+        if(doubleStep === 'doubleStep'){
+            chessTableTrGo = document.querySelector('[data-y="'+  corsY2 +'"] > td[data-x="'+  corsX +'"]');
+            if(chessTableTrGo.childNodes.length === 0){
+                chessTableTrGo.className += ' go';
+            } else {
+                return false;
+            }
+        }
+        chessTableTrGo = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
         if(chessTableTrGo.childNodes.length === 0) {
             chessTableTrGo.className += ' go';
         }
@@ -343,9 +559,11 @@
     };
     Game.prototype.goOrKillMove = function(self, target){
         if(target.classList.contains('go')){
-           self.goMove(self, target);
-        } else if(target.classList.contains('kill')){
-            self.killMove();
+            self.goMove(self, target);
+
+        } else if(target.parentElement.classList.contains('kill')){
+            console.log(2);
+            self.killMove(self, target);
         }
     };
     Game.prototype.goMove = function(self, target) {
@@ -360,18 +578,40 @@
        self.cleanTdAndSpan();
        var walker = document.body.classList.contains("white");
        if(walker) {
-            walker = 'black';
+           walker = 'black';
            document.body.classList.remove("white");
            document.body.classList.add("black");
-        } else {
+       } else {
            walker = 'white';
            document.body.classList.remove("black");
            document.body.classList.add("white");
-        }
-       socket.emit('stepToGo', cordsArray, personID, walker);
+       }
+        socket.emit('stepToGo', cordsArray, personID, walker);
     };
     Game.prototype.killMove = function(self, target) {
-
+        var elem = document.querySelector('.focus'),
+            parentElem = target.parentElement,
+            cordsArray = [];
+        cordsArray[0] = target.parentNode.dataset.x;
+        cordsArray[1] = target.parentNode.parentNode.dataset.y;
+        cordsArray[2] = elem.parentNode.dataset.x;
+        cordsArray[3] = elem.parentNode.parentNode.dataset.y;
+        cordsArray[4] = elem.getAttribute('data-figurename');
+        cordsArray[5] = target.getAttribute('data-figurename');
+        target.remove();
+        parentElem.appendChild(elem);
+        self.cleanTdAndSpan();
+        var walker = document.body.classList.contains("white");
+        if(walker) {
+            walker = 'black';
+            document.body.classList.remove("white");
+            document.body.classList.add("black");
+        } else {
+            walker = 'white';
+            document.body.classList.remove("black");
+            document.body.classList.add("white");
+        }
+        socket.emit('stepToKill', cordsArray, personID, walker);
     };
     window.__games = Game;
 })();

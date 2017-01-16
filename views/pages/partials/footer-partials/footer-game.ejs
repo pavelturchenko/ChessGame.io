@@ -38,7 +38,9 @@
             document.body.classList.add("black");
         }
     });
+    socket.on('stepToKill', function (cordsArray, walker) {
 
+    });
     function getCookie(name) {
         var matches = document.cookie.match(new RegExp(
             "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
