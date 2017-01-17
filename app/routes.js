@@ -88,9 +88,7 @@ module.exports = function (app, passport, io) {
                 });
                 io.emit('selectGame', gameMap);
             });
-
         });
-
         socket.on('createGame', function (creatorID) {
             /*При создании игры заносим созданные игры в базу данных
              * Проверяем наличие этой игры в базе, если есть, то не даобавляем*/
@@ -113,7 +111,6 @@ module.exports = function (app, passport, io) {
             socket.join('games' + creatorID);
             io.emit('createGame', creatorID);
         });
-
         socket.on("connectToGame", function (creatorID, personID) {
             if (creatorID === personID) {
                 return false
@@ -168,14 +165,11 @@ module.exports = function (app, passport, io) {
             newGame.save(function (err, newGame, affected) {
                 if (err) throw err;
             });
-
             io.to(games).emit('redirect', games);
         });
-
         socket.on('connectServerGame', function () {
             io.emit('connectServerGame', personSessionID);
         });
-
         socket.on('connectToGameRoom', function (personID) {
             Game.find({}, function (err, gameID) {
                 gameID.forEach(function (gameID) {
@@ -214,6 +208,7 @@ module.exports = function (app, passport, io) {
                                     if(figureName == cordsName){
                                         newFigurePosition[colorName][figureName][0] = cordsArray[1];
                                         newFigurePosition[colorName][figureName][1] = cordsArray[0];
+
                                         Game.update({joinedID: personID}, {
                                             walker: walker,
                                             figurePosition: newFigurePosition
@@ -229,12 +224,79 @@ module.exports = function (app, passport, io) {
                     }
                 });
             });
-
         });
         socket.on('stepToKill', function (cordsArray, personID, walker) {
-
+            var cordsNameBeating = cordsArray[4],
+                cordsNameBroken = cordsArray[5],
+                newFigurePosition;
+            Game.find({}, function (err, gameID) {
+                gameID.forEach(function (gameID) {
+                    if (gameID.creatorID === personID || gameID.joinedID === personID) {
+                        newFigurePosition = gameID.figurePosition;
+                        for (var colorName in newFigurePosition) {
+                            if(colorName === "white" && colorName != walker){
+                                for (var figureName in newFigurePosition[colorName]) {
+                                    if(figureName == cordsNameBeating){
+                                        newFigurePosition[colorName][figureName][0] = cordsArray[1];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[0];
+                                        Game.update({creatorID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
+                                }
+                            } else if(colorName === "black" && colorName != walker){
+                                for (var figureName in newFigurePosition[colorName]) {
+                                    if(figureName == cordsNameBeating){
+                                        newFigurePosition[colorName][figureName][0] = cordsArray[1];
+                                        newFigurePosition[colorName][figureName][1] = cordsArray[0];
+                                        Game.update({joinedID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
+                                }
+                            }
+                        }
+                        return false
+                    }
+                });
+            });
+            Game.find({}, function (err, gameID) {
+                gameID.forEach(function (gameID) {
+                    if (gameID.creatorID === personID || gameID.joinedID === personID) {
+                        for (var colorName in newFigurePosition) {
+                            if(colorName === "white" && colorName === walker){
+                                for (var figureName in newFigurePosition[colorName]) {
+                                    if(figureName == cordsNameBroken){
+                                        newFigurePosition[colorName][figureName][0] = 'kill';
+                                        newFigurePosition[colorName][figureName][1] = 'kill';
+                                        Game.update({joinedID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
+                                }
+                            } else if(colorName === "black" && colorName === walker){
+                                for (var figureName in newFigurePosition[colorName]) {
+                                    if(figureName == cordsNameBroken){
+                                        newFigurePosition[colorName][figureName][0] = 'kill';
+                                        newFigurePosition[colorName][figureName][1] = 'kill';
+                                        Game.update({creatorID: personID}, {
+                                            walker: walker,
+                                            figurePosition: newFigurePosition
+                                        }, function (err, numberAffected, rawResponse) {});
+                                    }
+                                }
+                            }
+                        }
+                        var games = gameID.gameID;
+                        socket.broadcast.to(games).emit('stepToKill', walker, cordsArray);
+                        return false
+                    }
+                });
+            });
         });
-
         socket.on('disconnect', function () {
             var disconnentId = this.id;
             /*Удаляем игру из списка*/

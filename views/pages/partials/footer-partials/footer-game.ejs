@@ -38,8 +38,23 @@
             document.body.classList.add("black");
         }
     });
-    socket.on('stepToKill', function (cordsArray, walker) {
-
+    socket.on('stepToKill', function (walker, cordsArray) {
+        var corXParent = cordsArray[0],
+            corYParent = cordsArray[1],
+            corXChild = cordsArray[2],
+            corYChild = cordsArray[3],
+            targetChild = document.querySelector('[data-y="'+  corYParent +'"] > td[data-x="'+  corXParent +'"] > span'),
+            targetParent = document.querySelector('[data-y="'+  corYParent +'"] > td[data-x="'+  corXParent +'"]'),
+            elem = document.querySelector('[data-y="'+  corYChild +'"] > td[data-x="'+  corXChild +'"] > span');
+        targetChild.remove();
+        targetParent.appendChild(elem);
+        if(walker === "white"){
+            document.body.classList.remove("black");
+            document.body.classList.add("white");
+        } else {
+            document.body.classList.remove("white");
+            document.body.classList.add("black");
+        }
     });
     function getCookie(name) {
         var matches = document.cookie.match(new RegExp(

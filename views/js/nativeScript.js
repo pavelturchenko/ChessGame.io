@@ -45,11 +45,17 @@
         this.addFigureToBoard = function(figurePosition) {
             for (var colorName in figurePosition) {
                 for (var figureName in figurePosition[colorName]) {
-                    var parentTd = document.querySelector('[data-y = "'+ Number(figurePosition[colorName][figureName][0]) +'"] > [data-x = "'+ Number(figurePosition[colorName][figureName][1]) +'"]')
-                    var elem = document.createElement('span');
-                    elem.className = figurePosition[colorName][figureName][2];
-                    elem.setAttribute('data-figurename', figureName);
-                    parentTd.appendChild(elem);
+                    var corsY = figurePosition[colorName][figureName][0],
+                        corsX = figurePosition[colorName][figureName][1];
+                    if( corsY === 'kill' || corsX === 'kill') {
+                        continue;
+                    } else {
+                        var parentTd = document.querySelector('[data-y = "'+ Number(corsY) +'"] > [data-x = "'+ Number(corsX) +'"]')
+                        var elem = document.createElement('span');
+                        elem.className = figurePosition[colorName][figureName][2];
+                        elem.setAttribute('data-figurename', figureName);
+                        parentTd.appendChild(elem);
+                    }
                 }
             }
             if(this.player == 'white'){
@@ -77,6 +83,7 @@
             if (self.player === 'white' && targetColor === 'b' && targetParents !== 'rows'){
                 if(target.parentElement.classList.contains('kill')){
                     self.goOrKillMove(self, target);
+                    return false;
                 } else {
                     return false;
                 }
@@ -84,12 +91,16 @@
             if (self.player === 'black' && targetColor === 'w' && targetParents !== 'rows'){
                 if(target.parentElement.classList.contains('kill')){
                     self.goOrKillMove(self, target);
+                    return false;
                 } else {
                     return false;
                 }
             }
-            if(targetParents !== 'rows') {
-                self.selectFigure(self, target);
+            if(targetParents !== 'rows' ) {
+
+                if(targetParents !== 'kill'){
+                    self.selectFigure(self, target);
+                }
             } else {
                 self.goOrKillMove(self, target);
             }
@@ -120,7 +131,7 @@
             corsXKillRight = Number(corsArray[0]) - 1,
             walker = document.body.classList.contains('white');
         target.className  += ' focus';
-
+        self.canMove(self, target);
         if(self.player === 'white' && walker){
             corsY = Number(corsArray[1]) + 1;
             corsX = Number(corsArray[0]);
@@ -175,102 +186,45 @@
         }
 
         function knightMoveTop(corsX, corsY, colorFigure) {
-            var parentXCors,
-                parentYCors,
+            var parentXCors = corsX + 1,
+                parentYCors = corsY + 2,
                 elem;
-            if(colorFigure === 'white'){
-                parentXCors = corsX + 1;
-                parentYCors = corsY + 2;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-
                 parentXCors = corsX - 1;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-            } else {
-                parentXCors = corsX + 1;
-                parentYCors = corsY - 2;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-
-                parentXCors = corsX - 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-            }
         }
         function knightMoveBottom(corsX, corsY, colorFigure) {
-            var parentXCors,
-                parentYCors,
+            var parentXCors = corsX + 1,
+                parentYCors = corsY - 2,
                 elem;
-            if(colorFigure === 'black'){
-                parentXCors = corsX + 1;
-                parentYCors = corsY + 2;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-
                 parentXCors = corsX - 1;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-            } else {
-                parentXCors = corsX + 1;
-                parentYCors = corsY - 2;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-
-                parentXCors = corsX - 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-            }
         }
         function knightMoveLeft(corsX, corsY, colorFigure) {
-            var parentXCors,
-                parentYCors,
+            var parentXCors = corsX + 2,
+                parentYCors = corsY + 1,
                 elem;
-
-            if(colorFigure === 'white'){
-                parentXCors = corsX + 2;
-                parentYCors = corsY + 1;
+                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
+                elemInspection(elem, colorFigure);
+                parentYCors = corsY - 1;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
 
-                parentXCors = corsY - 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-            } else {
-                parentXCors = corsX - 2;
-                parentYCors = corsY + 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-
-                parentXCors = corsX + 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-            }
         }
         function knightMoveRight(corsX, corsY, colorFigure) {
-            var parentXCors,
-                parentYCors,
+            var parentXCors = corsX - 2,
+                parentYCors = corsY + 1,
                 elem;
-
-            if(colorFigure === 'white'){
-                parentXCors = corsX + 2;
-                parentYCors = corsY + 1;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-
-                parentXCors = corsY - 1;
+                parentYCors = corsY - 1;
                 elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
                 elemInspection(elem, colorFigure);
-            } else {
-                parentXCors = corsX - 2;
-                parentYCors = corsY + 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-
-                parentXCors = corsX + 1;
-                elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-                elemInspection(elem, colorFigure);
-            }
         }
         function elemInspection(elem, colorFigure){
             if(elem != null && elem.childNodes.length === 0){
@@ -278,12 +232,8 @@
             } else if(elem != null && elem.childNodes.length !== 0){
                 if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
                     elem.className += " kill";
-                    return false;
                 } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
                     elem.className += " kill";
-                    return false;
-                } else {
-                    return false;
                 }
             }
         }
@@ -391,6 +341,80 @@
                 } else {
                     return false;
                 }
+            }
+        }
+    };
+    Game.prototype.canMove = function(self, target){
+        var corX = target.parentNode.dataset.x,
+            corY = target.parentNode.parentNode.dataset.y,
+            i,
+            diferent,
+            returnBroukFig,
+            colorFigure = self.player,
+            corsArray = [corX, corY];
+
+        searchLeftTop(corsArray, colorFigure);
+        searchRightBottom(corsArray, colorFigure);
+        searchRightTop(corsArray, colorFigure);
+        searchLeftBottom(corsArray, colorFigure);
+
+        function searchLeftTop(corsArray, colorFigure){
+            for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                returnBroukFig = broukFig(corY, corX, colorFigure, "leftTop");
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+
+            }
+        }
+        function searchRightBottom(corsArray, colorFigure){
+            for ( i = Number(corsArray[0]) - 1; i > 0; i-- ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                returnBroukFig = broukFig(corY, corX, colorFigure, "rightBottom");
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+        function searchRightTop(corsArray, colorFigure){
+            for ( i = Number(corsArray[0]) - 1; i > 0; i-- ){
+                diferent = Number(corsArray[0]) - i;
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                returnBroukFig = broukFig(corY, corX, colorFigure, "rightTop");
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+        function searchLeftBottom(corsArray, colorFigure){
+            for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) - diferent;
+                returnBroukFig = broukFig(corY, corX, colorFigure, "leftBottom");
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+        function broukFig(corY, corX, colorFigure, wayfrom) {
+            var elem = document.querySelector('[data-y="'+ corY +'"] > [data-x="' + corX + '"] > span'),
+                elemKing = false;
+            if(elem != null && colorFigure == 'white'){
+                elemKing = elem.classList.contains('wK');
+                if(elemKing){
+                    console.log(wayfrom);
+                }
+            }
+            if(elem != null && colorFigure == 'black'){
+                elemKing = elem.classList.contains('bK');
+                console.log(wayfrom);
             }
         }
     };
@@ -518,6 +542,7 @@
             corsArray = [corX, corY];
         self.cleanTdAndSpan();
         return corsArray;
+
     };
     Game.prototype.cleanTdAndSpan = function() {
         var chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span'),
@@ -562,7 +587,6 @@
             self.goMove(self, target);
 
         } else if(target.parentElement.classList.contains('kill')){
-            console.log(2);
             self.killMove(self, target);
         }
     };
