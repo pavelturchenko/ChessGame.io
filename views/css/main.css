@@ -14,7 +14,7 @@ a {
 div.main-page {
     height:100vh;
     background: url("../img/main-fon.jpg") no-repeat;
-    background-size: 100% 100%;
+    background-size: cover;
 }
 .wrapper-main {
     background: rgba(0,0,0,0.5);
@@ -28,6 +28,11 @@ div.main-page {
 .wrapper-main p{
     color: #fff;
     font-size: 24px;
+}
+.wrap-select-game {
+    min-height: 100vh;
+    background: url("../img/select-game-bg.jpg") no-repeat;
+    background-size: cover;
 }
 body.login-page {
     height:100vh;
@@ -125,4 +130,10 @@ body.profile-page {
 }
 .creare-game a:hover{
     text-decoration: none;
+}
+.wrap-game {
+    min-height: 100vh;
+    background: url("../img/games-bg.jpg") no-repeat;
+    background-size: cover;
+    padding-top: 50px;
 }

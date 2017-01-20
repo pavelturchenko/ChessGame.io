@@ -7,7 +7,7 @@ table {
 	position: relative;
 	left: 50%;
 	margin-left: -250px;
-	margin-top: 5%;
+	/*margin-top: 5%;*/
 }
 table tr {
 	border: 1px solid #000;

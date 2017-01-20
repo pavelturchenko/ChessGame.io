@@ -10,7 +10,7 @@
             var tableTag = document.createElement('table');
             tableTag.className = 'chess-board';
             tableTag.setAttribute('id', 'chess-board');
-            document.getElementsByClassName('wrap')[0].appendChild(tableTag);
+            document.getElementsByClassName('wrap-game')[0].appendChild(tableTag);
             for (var i = 1; i < 9; i++){
                 var trTag = document.createElement('tr');
                 trTag.setAttribute('data-y', i);
@@ -99,7 +99,7 @@
             if(targetParents !== 'rows' ) {
 
                 if(targetParents !== 'kill'){
-                    self.selectFigure(self, target);
+                    self.canMove(self, target);
                 }
             } else {
                 self.goOrKillMove(self, target);
@@ -131,7 +131,6 @@
             corsXKillRight = Number(corsArray[0]) - 1,
             walker = document.body.classList.contains('white');
         target.className  += ' focus';
-        self.canMove(self, target);
         if(self.player === 'white' && walker){
             corsY = Number(corsArray[1]) + 1;
             corsX = Number(corsArray[0]);
@@ -351,71 +350,145 @@
             diferent,
             returnBroukFig,
             colorFigure = self.player,
-            corsArray = [corX, corY];
+            corsArray = [corX, corY],
+            leftDiagonalArray = [],
+            rightDiagonalArray = [];
 
-        searchLeftTop(corsArray, colorFigure);
-        searchRightBottom(corsArray, colorFigure);
-        searchRightTop(corsArray, colorFigure);
-        searchLeftBottom(corsArray, colorFigure);
+        searchLeftTop(corsArray);
+        searchRightBottom(corsArray);
+        searchRightTop(corsArray);
+        searchLeftBottom(corsArray);
 
-        function searchLeftTop(corsArray, colorFigure){
+        function searchLeftTop(corsArray){
             for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, colorFigure, "leftTop");
+                returnBroukFig = broukFig(corY, corX, "leftTop");
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
 
             }
         }
-        function searchRightBottom(corsArray, colorFigure){
-            for ( i = Number(corsArray[0]) - 1; i > 0; i-- ){
+        function searchRightBottom(corsArray){
+            for ( i = Number(corsArray[0]); i > 0; i-- ){
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, colorFigure, "rightBottom");
+                returnBroukFig = broukFig(corY, corX, "rightBottom");
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
-        function searchRightTop(corsArray, colorFigure){
+        function searchRightTop(corsArray){
             for ( i = Number(corsArray[0]) - 1; i > 0; i-- ){
                 diferent = Number(corsArray[0]) - i;
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, colorFigure, "rightTop");
+                returnBroukFig = broukFig(corY, corX, "rightTop");
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
-        function searchLeftBottom(corsArray, colorFigure){
-            for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
+        function searchLeftBottom(corsArray){
+            for ( i = Number(corsArray[0]); i <= 8; i++ ){
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) - diferent;
-                returnBroukFig = broukFig(corY, corX, colorFigure, "leftBottom");
+                returnBroukFig = broukFig(corY, corX, "leftBottom");
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
-        function broukFig(corY, corX, colorFigure, wayfrom) {
+        function broukFig(corY, corX, wayfrom) {
             var elem = document.querySelector('[data-y="'+ corY +'"] > [data-x="' + corX + '"] > span'),
-                elemKing = false;
-            if(elem != null && colorFigure == 'white'){
-                elemKing = elem.classList.contains('wK');
-                if(elemKing){
-                    console.log(wayfrom);
+                elemClass,
+                elemName,
+                newSubArray = [],
+                disassembleItem;
+            if(elem != null && wayfrom === "leftTop"){
+                disassembleItem = parseElem();
+                return leftDiagonalArray.push(disassembleItem);
+            } else if(elem != null && wayfrom === "rightBottom") {
+                disassembleItem = parseElem();
+                return leftDiagonalArray.unshift(disassembleItem);
+            } else if(elem != null && wayfrom === "rightTop") {
+                disassembleItem = parseElem();
+                return rightDiagonalArray.push(disassembleItem);
+            } else if(elem != null && wayfrom === "leftBottom") {
+                disassembleItem = parseElem();
+                return rightDiagonalArray.unshift(disassembleItem);
+            }
+            function parseElem() {
+                elemClass = elem.className.slice(0,2);
+                elemName = elem.dataset.figurename;
+                return newSubArray = [elemClass, elemName];
+            }
+        }
+        var kingPosArr = "",
+            queenPosArr = "",
+            bishopPosArr = "",
+            colorAnalize,
+            colorEnemy;
+        if(colorFigure === "white") {
+            colorAnalize = 'w';
+            colorEnemy = 'b';
+            sortOutLeftDiagonal(colorAnalize, colorEnemy);
+            if(typeof kingPosArr != "number") {
+                kingPosArr = "";
+                queenPosArr = "";
+                bishopPosArr = "";
+                sortOutRightDiagonal(colorAnalize, colorEnemy);
+                console.log('dasa')
+            }
+        } else {
+            colorAnalize = 'b';
+            colorEnemy = 'w';
+            sortOutLeftDiagonal(colorAnalize, colorEnemy);
+            if(typeof kingPosArr != "number") {
+                kingPosArr = "";
+                queenPosArr = "";
+                bishopPosArr = "";
+                sortOutRightDiagonal(colorAnalize, colorEnemy);
+            }
+        }
+        function sortOutLeftDiagonal(colorAnalize, colorEnemy){
+            for(i = 0; i < leftDiagonalArray.length; i++ ){
+                if(leftDiagonalArray[i][0] === colorAnalize + 'K'){
+                    kingPosArr = i;
+                } else if(leftDiagonalArray[i][0] === colorEnemy + 'Q'){
+                    queenPosArr = i;
+                } else if(leftDiagonalArray[i][0] === colorEnemy + 'B'){
+                    bishopPosArr = i;
                 }
             }
-            if(elem != null && colorFigure == 'black'){
-                elemKing = elem.classList.contains('bK');
-                console.log(wayfrom);
+        }
+        function sortOutRightDiagonal(colorAnalize){
+            for(i = 0; i < rightDiagonalArray.length; i++ ){
+                if(rightDiagonalArray[i][0] === colorAnalize + 'K'){
+                    kingPosArr = i;
+                }
+                if(rightDiagonalArray[i][0] === colorAnalize + 'Q'){
+                    queenPosArr = i;
+                }
+                if(rightDiagonalArray[i][0] === colorAnalize + 'B'){
+                    bishopPosArr = i;
+                }
             }
+        }
+        if(queenPosArr != "" && bishopPosArr != ""){
+            console.log(1)
+        } else {
+            console.log(queenPosArr - bishopPosArr)
+        }
+        if(queenPosArr - kingPosArr != 2 || bishopPosArr - kingPosArr != 2){
+            self.selectFigure(self, target);
+        } else {
+          console.log('запуск функции расчета возможности удара по фигуре');
         }
     };
     Game.prototype.moveRookAndForwardMoveQueen = function(self, corsArray, colorFigure) {
