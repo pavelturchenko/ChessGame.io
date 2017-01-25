@@ -4,6 +4,7 @@
 "use strict";
 
 ;(function(){
+    // сам конструтор, содержит в себе построение поля
     function Game(colorPlayer, figurePosition){
         this.player = colorPlayer;
         this.buildTable = function(){
@@ -105,8 +106,8 @@
                 self.goOrKillMove(self, target);
             }
         }
-
     }
+    // функция выдиления фигуры
     Game.prototype.selectFigure = function(self, target){
         if(target.className === 'wP' || target.className === 'bP'){
             self.calculationPawnMoves(self, target);
@@ -122,6 +123,7 @@
             self.calculationKingMoves(self, target);
         }
     };
+    // функция расчета хода пешки
     Game.prototype.calculationPawnMoves = function(self, target){
         var corsArray = self.readCorsAndRemoveFocus(self, target),
             corsY,
@@ -153,6 +155,7 @@
             }
         }
     };
+    // функция расчета хода ладьи
     Game.prototype.calculationRookMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
             walker = document.body.classList.contains('white');
@@ -164,6 +167,7 @@
             self.moveRookAndForwardMoveQueen(self, corsArray, 'black');
         }
     };
+    // функция расчета хода коня
     Game.prototype.calculationKnightMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
             corsX = Number(corsArray[0]),
@@ -237,30 +241,47 @@
             }
         }
     };
+    // функция расчета хода слона
     Game.prototype.calculationBishopMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
-            walker = document.body.classList.contains('white');
+            walker = document.body.classList.contains('white'),
+            colorWalker = self.player;
         if(self.player === 'white' && walker) {
             target.className  += ' focus';
-            self.moveBishopAndForwardMoveQueen(self, corsArray, 'white');
+            callSearchDiagonal(self);
         } else if(self.player === 'black' && !walker) {
             target.className  += ' focus';
-            self.moveBishopAndForwardMoveQueen(self, corsArray, 'black');
+            callSearchDiagonal(self);
         }
+        function callSearchDiagonal(self){
+            self.searchLeftTop(self, corsArray, colorWalker);
+            self.searchRightBottom(self, corsArray, colorWalker);
+            self.searchRightTop(self, corsArray, colorWalker);
+            self.searchLeftBottom(self, corsArray, colorWalker);
+        }
+
     };
+    // функция расчета хода ферзя
     Game.prototype.calculationQueenMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
-            walker = document.body.classList.contains('white');
+            walker = document.body.classList.contains('white'),
+            colorWalker = self.player;
         if(self.player === 'white' && walker) {
             target.className  += ' focus';
-            self.moveRookAndForwardMoveQueen(self, corsArray, 'white');
-            self.moveBishopAndForwardMoveQueen(self, corsArray, 'white');
+            callSearchDiagonal(self);
         } else if(self.player === 'black' && !walker) {
             target.className  += ' focus';
-            self.moveRookAndForwardMoveQueen(self, corsArray, 'black');
-            self.moveBishopAndForwardMoveQueen(self, corsArray, 'black');
+            callSearchDiagonal(self);
+        }
+        function callSearchDiagonal(self){
+            self.searchLeftTop(self, corsArray, colorWalker);
+            self.searchRightBottom(self, corsArray, colorWalker);
+            self.searchRightTop(self, corsArray, colorWalker);
+            self.searchLeftBottom(self, corsArray, colorWalker);
+            self.moveRookAndForwardMoveQueen(self, corsArray, colorWalker);
         }
     };
+    // функция арсчета хода короля
     Game.prototype.calculationKingMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
             corsX = Number(corsArray[0]),
@@ -343,95 +364,31 @@
             }
         }
     };
+    // функция проверки битой фигуры
     Game.prototype.canMove = function(self, target){
         var corX = target.parentNode.dataset.x,
             corY = target.parentNode.parentNode.dataset.y,
+            targetClass = target.className,
+            targetData= target.dataset.figurename,
             i,
             diferent,
             returnBroukFig,
             colorFigure = self.player,
             corsArray = [corX, corY],
             leftDiagonalArray = [],
-            rightDiagonalArray = [];
+            rightDiagonalArray = [],
+            canIMove = true,
+            numberStep = 0;
 
-        searchLeftTop(corsArray);
-        searchRightBottom(corsArray);
-        searchRightTop(corsArray);
-        searchLeftBottom(corsArray);
+        self.searchLeftTop(self, corsArray, diferent, returnBroukFig,  leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchRightBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchRightTop(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchLeftBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
 
-        function searchLeftTop(corsArray){
-            for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
-                diferent = i - Number(corsArray[0]);
-                corX = i;
-                corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, "leftTop");
-                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
-                    break;
-                }
-
-            }
-        }
-        function searchRightBottom(corsArray){
-            for ( i = Number(corsArray[0]); i > 0; i-- ){
-                diferent = i - Number(corsArray[0]);
-                corX = i;
-                corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, "rightBottom");
-                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
-                    break;
-                }
-            }
-        }
-        function searchRightTop(corsArray){
-            for ( i = Number(corsArray[0]) - 1; i > 0; i-- ){
-                diferent = Number(corsArray[0]) - i;
-                corX = i;
-                corY = Number(corsArray[1]) + diferent;
-                returnBroukFig = broukFig(corY, corX, "rightTop");
-                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
-                    break;
-                }
-            }
-        }
-        function searchLeftBottom(corsArray){
-            for ( i = Number(corsArray[0]); i <= 8; i++ ){
-                diferent = i - Number(corsArray[0]);
-                corX = i;
-                corY = Number(corsArray[1]) - diferent;
-                returnBroukFig = broukFig(corY, corX, "leftBottom");
-                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
-                    break;
-                }
-            }
-        }
-        function broukFig(corY, corX, wayfrom) {
-            var elem = document.querySelector('[data-y="'+ corY +'"] > [data-x="' + corX + '"] > span'),
-                elemClass,
-                elemName,
-                newSubArray = [],
-                disassembleItem;
-            if(elem != null && wayfrom === "leftTop"){
-                disassembleItem = parseElem();
-                return leftDiagonalArray.push(disassembleItem);
-            } else if(elem != null && wayfrom === "rightBottom") {
-                disassembleItem = parseElem();
-                return leftDiagonalArray.unshift(disassembleItem);
-            } else if(elem != null && wayfrom === "rightTop") {
-                disassembleItem = parseElem();
-                return rightDiagonalArray.push(disassembleItem);
-            } else if(elem != null && wayfrom === "leftBottom") {
-                disassembleItem = parseElem();
-                return rightDiagonalArray.unshift(disassembleItem);
-            }
-            function parseElem() {
-                elemClass = elem.className.slice(0,2);
-                elemName = elem.dataset.figurename;
-                return newSubArray = [elemClass, elemName];
-            }
-        }
         var kingPosArr = "",
             queenPosArr = "",
             bishopPosArr = "",
+            targetPosArr = "",
             colorAnalize,
             colorEnemy;
         if(colorFigure === "white") {
@@ -442,8 +399,8 @@
                 kingPosArr = "";
                 queenPosArr = "";
                 bishopPosArr = "";
+                targetPosArr = "";
                 sortOutRightDiagonal(colorAnalize, colorEnemy);
-                console.log('dasa')
             }
         } else {
             colorAnalize = 'b';
@@ -453,6 +410,7 @@
                 kingPosArr = "";
                 queenPosArr = "";
                 bishopPosArr = "";
+                targetPosArr = "";
                 sortOutRightDiagonal(colorAnalize, colorEnemy);
             }
         }
@@ -460,10 +418,15 @@
             for(i = 0; i < leftDiagonalArray.length; i++ ){
                 if(leftDiagonalArray[i][0] === colorAnalize + 'K'){
                     kingPosArr = i;
-                } else if(leftDiagonalArray[i][0] === colorEnemy + 'Q'){
+                }
+                if(leftDiagonalArray[i][0] === colorEnemy + 'Q'){
                     queenPosArr = i;
-                } else if(leftDiagonalArray[i][0] === colorEnemy + 'B'){
+                }
+                if(leftDiagonalArray[i][0] === colorEnemy + 'B'){
                     bishopPosArr = i;
+                }
+                if(leftDiagonalArray[i][0] == targetClass && leftDiagonalArray[i][1] == targetData) {
+                    targetPosArr = i;
                 }
             }
         }
@@ -478,19 +441,209 @@
                 if(rightDiagonalArray[i][0] === colorAnalize + 'B'){
                     bishopPosArr = i;
                 }
+                if(rightDiagonalArray[i][0] == targetClass && rightDiagonalArray[i][1] == targetData) {
+                    targetPosArr = i;
+                }
             }
         }
-        if(queenPosArr != "" && bishopPosArr != ""){
-            console.log(1)
-        } else {
-            console.log(queenPosArr - bishopPosArr)
+        
+        if(queenPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
+            canIMove = false;
         }
-        if(queenPosArr - kingPosArr != 2 || bishopPosArr - kingPosArr != 2){
+        if(bishopPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
+            canIMove = false;
+        }
+        if(canIMove === true){
             self.selectFigure(self, target);
         } else {
           console.log('запуск функции расчета возможности удара по фигуре');
         }
     };
+    // функция расчета диагонали слева-вверх
+    Game.prototype.searchLeftTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+        var i = 0,
+            corX = 0,
+            corY = 0;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        if(self.player == 'white'){
+            for ( i = Number(corsArray[0]) + numberStep; i <= 8; i++ ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        } else {
+            for ( i = Number(corsArray[0]) - numberStep; i >= 0; i--){
+                diferent =  Number(corsArray[0]) - i;
+                corX = i;
+                corY = Number(corsArray[1]) - diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+
+    };
+    // функция расчета диагонали справа-вниз
+    Game.prototype.searchRightBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+        var i = 0,
+            corX = 0,
+            corY = 0;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        if(self.player == 'white'){
+
+            for ( i = Number(corsArray[0]) - numberStep; i > 0; i-- ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        } else {
+            for ( i = Number(corsArray[0]) + numberStep; i > 0; i++ ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+
+    };
+    // функция расчета диагонали справа-вверх
+    Game.prototype.searchRightTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+        var i = 0,
+            corX = 0,
+            corY = 0;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        if(self.player == 'white'){
+            for ( i = Number(corsArray[0]) - numberStep; i > 0; i-- ){
+                diferent = Number(corsArray[0]) - i;
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        } else {
+            for ( i = Number(corsArray[0]) + numberStep; i > 0; i++ ){
+                diferent = Number(corsArray[0]) - i;
+                corX = i;
+                corY = Number(corsArray[1]) + diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+    };
+    // функция расчета диагонали слева-вниз
+    Game.prototype.searchLeftBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+        var i = 0,
+            corX = 0,
+            corY = 0;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        if(self.player == 'white'){
+            for ( i = Number(corsArray[0]) + numberStep; i <= 8; i++ ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) - diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        } else {
+            for ( i = Number(corsArray[0]) - numberStep; i <= 8; i-- ){
+                diferent = i - Number(corsArray[0]);
+                corX = i;
+                corY = Number(corsArray[1]) - diferent;
+                if(numberStep === 0) {
+                    returnBroukFig = self.broukFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                } else {
+                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    console.log(corX);
+                    console.log(corY);
+                }
+                if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                    break;
+                }
+            }
+        }
+
+    };
+    // функция сбора данных в диагональ
+    Game.prototype.broukFig = function(corY, corX, wayfrom, leftDiagonalArray, rightDiagonalArray) {
+        var elem = document.querySelector('[data-y="'+ corY +'"] > [data-x="' + corX + '"] > span'),
+            elemClass,
+            elemName,
+            newSubArray = [],
+            disassembleItem;
+        if(elem != null && wayfrom === "leftTop"){
+            disassembleItem = parseElem();
+            return leftDiagonalArray.push(disassembleItem);
+        } else if(elem != null && wayfrom === "rightBottom") {
+            disassembleItem = parseElem();
+            return leftDiagonalArray.unshift(disassembleItem);
+        } else if(elem != null && wayfrom === "rightTop") {
+            disassembleItem = parseElem();
+            return rightDiagonalArray.push(disassembleItem);
+        } else if(elem != null && wayfrom === "leftBottom") {
+            disassembleItem = parseElem();
+            return rightDiagonalArray.unshift(disassembleItem);
+        }
+        function parseElem() {
+            elemClass = elem.className.slice(0,2);
+            elemName = elem.dataset.figurename;
+            return newSubArray = [elemClass, elemName];
+        }
+    };
+    // циклы расчета ходов ладьи и ферзя
     Game.prototype.moveRookAndForwardMoveQueen = function(self, corsArray, colorFigure) {
         var elem,
             i,
@@ -548,67 +701,25 @@
             }
         }
     };
-    Game.prototype.moveBishopAndForwardMoveQueen = function(self, corsArray, colorFigure) {
-        var elem,
-            i,
-            returnBishopSteps,
-            corsY,
-            corsX,
-            diferent;
-
-        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
-            diferent = i - Number(corsArray[1]);
-            corsY = i;
-            corsX = Number(corsArray[0]) + diferent;
-            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
-            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
-                break;
-            }
-        }
-        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
-            diferent = i - Number(corsArray[1]);
-            corsY = i;
-            corsX = Number(corsArray[0]) - diferent;
-            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
-            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
-                break;
-            }
-        }
-        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
-            diferent = i - Number(corsArray[1]);
-            corsY = i;
-            corsX = Number(corsArray[0]) + diferent;
-            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
-            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
-                break;
-            }
-        }
-        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
-            diferent = i - Number(corsArray[1]);
-            corsY = i;
-            corsX = Number(corsArray[0]) - diferent;
-            returnBishopSteps = bishopSteps(corsY, corsX, colorFigure);
-            if(corsX > 8 || corsX < 0 || returnBishopSteps === false) {
-                break;
-            }
-        }
-        function bishopSteps(corsY, corsX, colorFigure){
-            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
-            } else if(elem != null && elem.childNodes.length !== 0){
-                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
-                    elem.className += " kill";
-                    return false;
-                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
-                    elem.className += " kill";
-                    return false;
-                } else {
-                    return false;
-                }
+    // шаги слона по координатам
+    Game.prototype.bishopSteps = function (corsY, corsX, self){
+        var elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]'),
+            colorFigure = self.player;
+        if(elem != null && elem.childNodes.length === 0){
+            elem.className += " go";
+        } else if(elem != null && elem.childNodes.length !== 0){
+            if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                elem.className += " kill";
+                return false;
+            } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                elem.className += " kill";
+                return false;
+            } else {
+                return false;
             }
         }
     };
+    // функция считывания координат и удаление фокуса с фигур
     Game.prototype.readCorsAndRemoveFocus = function(self, target){
         var corY = target.parentNode.parentNode.dataset.y,
             corX = target.parentNode.dataset.x,
@@ -617,6 +728,7 @@
         return corsArray;
 
     };
+    // функция очистки лишних классов с ячеек и фигур
     Game.prototype.cleanTdAndSpan = function() {
         var chessTableSpan = document.getElementById('chess-board').getElementsByTagName('span'),
             chessTableTd = document.getElementById('chess-board').getElementsByTagName('td');
@@ -628,6 +740,7 @@
             chessTableTd[j].classList.remove('kill');
         }
     };
+    // функция добавления класса хода
     Game.prototype.addClassGo = function(corsY, corsX , doubleStep, corsY2) {
         var chessTableTrGo;
         if(doubleStep === 'doubleStep'){
@@ -643,6 +756,7 @@
             chessTableTrGo.className += ' go';
         }
     };
+    // функция добавления класса удара
     Game.prototype.addClassKill = function(self, corsY, corsXKillLeft, corsXKillRight){
         var chessTableTrKill = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsXKillLeft +'"] > span');
         if(chessTableTrKill !== null && ((self.player === 'white' && chessTableTrKill.className.slice(0,1) === 'b') || (self.player === 'black' && chessTableTrKill.className.slice(0,1) === 'w'))){
@@ -655,6 +769,7 @@
             chessTableTrKill.className += ' kill';
         }
     };
+    // функция считывания клика по классу движения или удара
     Game.prototype.goOrKillMove = function(self, target){
         if(target.classList.contains('go')){
             self.goMove(self, target);
@@ -663,6 +778,7 @@
             self.killMove(self, target);
         }
     };
+    // функция движения при ходе
     Game.prototype.goMove = function(self, target) {
        var elem = document.querySelector('.focus'),
            cordsArray = [];
@@ -685,6 +801,7 @@
        }
         socket.emit('stepToGo', cordsArray, personID, walker);
     };
+    // функция движения при ударе
     Game.prototype.killMove = function(self, target) {
         var elem = document.querySelector('.focus'),
             parentElem = target.parentElement,
