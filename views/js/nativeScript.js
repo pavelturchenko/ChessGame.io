@@ -158,13 +158,20 @@
     // функция расчета хода ладьи
     Game.prototype.calculationRookMoves = function(self, target){
         var corsArray = this.readCorsAndRemoveFocus(self, target),
-            walker = document.body.classList.contains('white');
-        if(self.player === 'white' && walker) {
+            walker = document.body.classList.contains('white'),
+            colorWalker = self.player;
+        if(colorWalker === 'white' && walker) {
             target.className  += ' focus';
-            self.moveRookAndForwardMoveQueen(self, corsArray, 'white');
-        } else if(self.player === 'black' && !walker) {
+            callSearchForward(self);
+        } else if(colorWalker === 'black' && !walker) {
             target.className  += ' focus';
-            self.moveRookAndForwardMoveQueen(self, corsArray, 'black');
+            callSearchForward(self);
+        }
+        function callSearchForward(self){
+            self.searchLeftHorizontal(self, corsArray, colorWalker);
+            self.searchRightHorizontal(self, corsArray, colorWalker);
+            self.searchTopVertical(self, corsArray, colorWalker);
+            self.searchBottomVertical(self, corsArray, colorWalker);
         }
     };
     // функция расчета хода коня
@@ -246,10 +253,10 @@
         var corsArray = this.readCorsAndRemoveFocus(self, target),
             walker = document.body.classList.contains('white'),
             colorWalker = self.player;
-        if(self.player === 'white' && walker) {
+        if(colorWalker === 'white' && walker) {
             target.className  += ' focus';
             callSearchDiagonal(self);
-        } else if(self.player === 'black' && !walker) {
+        } else if(colorWalker === 'black' && !walker) {
             target.className  += ' focus';
             callSearchDiagonal(self);
         }
@@ -377,20 +384,24 @@
             corsArray = [corX, corY],
             leftDiagonalArray = [],
             rightDiagonalArray = [],
+            horizontalArray = [],
+            verticalArray = [],
             canIMove = true,
-            numberStep = 0;
-
-        self.searchLeftTop(self, corsArray, diferent, returnBroukFig,  leftDiagonalArray, rightDiagonalArray, numberStep);
-        self.searchRightBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
-        self.searchRightTop(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
-        self.searchLeftBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
-
-        var kingPosArr = "",
+            numberStep = 0,
+            kingPosArr = "",
             queenPosArr = "",
             bishopPosArr = "",
             targetPosArr = "",
             colorAnalize,
             colorEnemy;
+        self.searchLeftTop(self, corsArray, diferent, returnBroukFig,  leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchRightBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchRightTop(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchLeftBottom(self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep);
+        self.searchLeftHorizontal(self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep);
+        self.searchRightHorizontal(self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep);
+        self.searchTopVertical(self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep);
+        self.searchBottomVertical(self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep);
         if(colorFigure === "white") {
             colorAnalize = 'w';
             colorEnemy = 'b';
@@ -401,6 +412,20 @@
                 bishopPosArr = "";
                 targetPosArr = "";
                 sortOutRightDiagonal(colorAnalize, colorEnemy);
+                if(typeof kingPosArr != "number") {
+                    kingPosArr = "";
+                    queenPosArr = "";
+                    bishopPosArr = "";
+                    targetPosArr = "";
+                    sortOutHorizontal(colorAnalize, colorEnemy);
+                    if(typeof kingPosArr != "number") {
+                        kingPosArr = "";
+                        queenPosArr = "";
+                        bishopPosArr = "";
+                        targetPosArr = "";
+                        sortOutVertival(colorAnalize, colorEnemy);
+                    }
+                }
             }
         } else {
             colorAnalize = 'b';
@@ -412,6 +437,20 @@
                 bishopPosArr = "";
                 targetPosArr = "";
                 sortOutRightDiagonal(colorAnalize, colorEnemy);
+                if(typeof kingPosArr != "number") {
+                    kingPosArr = "";
+                    queenPosArr = "";
+                    bishopPosArr = "";
+                    targetPosArr = "";
+                    sortOutHorizontal(colorAnalize, colorEnemy);
+                    if(typeof kingPosArr != "number") {
+                        kingPosArr = "";
+                        queenPosArr = "";
+                        bishopPosArr = "";
+                        targetPosArr = "";
+                        sortOutVertival(colorAnalize, colorEnemy);
+                    }
+                }
             }
         }
         function sortOutLeftDiagonal(colorAnalize, colorEnemy){
@@ -430,15 +469,15 @@
                 }
             }
         }
-        function sortOutRightDiagonal(colorAnalize){
+        function sortOutRightDiagonal(colorAnalize, colorEnemy){
             for(i = 0; i < rightDiagonalArray.length; i++ ){
                 if(rightDiagonalArray[i][0] === colorAnalize + 'K'){
                     kingPosArr = i;
                 }
-                if(rightDiagonalArray[i][0] === colorAnalize + 'Q'){
+                if(rightDiagonalArray[i][0] === colorEnemy + 'Q'){
                     queenPosArr = i;
                 }
-                if(rightDiagonalArray[i][0] === colorAnalize + 'B'){
+                if(rightDiagonalArray[i][0] === colorEnemy + 'B'){
                     bishopPosArr = i;
                 }
                 if(rightDiagonalArray[i][0] == targetClass && rightDiagonalArray[i][1] == targetData) {
@@ -446,7 +485,39 @@
                 }
             }
         }
-        
+        function sortOutHorizontal(colorAnalize, colorEnemy){
+            for(i = 0; i < horizontalArray.length; i++ ){
+
+                if(horizontalArray[i][0] === colorAnalize + 'K'){
+                    kingPosArr = i;
+                }
+                if(horizontalArray[i][0] === colorEnemy + 'Q'){
+                    queenPosArr = i;
+                }
+                if(horizontalArray[i][0] === colorEnemy + 'B'){
+                    bishopPosArr = i;
+                }
+                if(horizontalArray[i][0] == targetClass && horizontalArray[i][1] == targetData) {
+                    targetPosArr = i;
+                }
+            }
+        }
+        function sortOutVertival(colorAnalize, colorEnemy){
+            for(i = 0; i < verticalArray.length; i++ ){
+                if(verticalArray[i][0] === colorAnalize + 'K'){
+                    kingPosArr = i;
+                }
+                if(verticalArray[i][0] === colorEnemy + 'Q'){
+                    queenPosArr = i;
+                }
+                if(verticalArray[i][0] === colorEnemy + 'B'){
+                    bishopPosArr = i;
+                }
+                if(verticalArray[i][0] == targetClass && verticalArray[i][1] == targetData) {
+                    targetPosArr = i;
+                }
+            }
+        }
         if(queenPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
             canIMove = false;
         }
@@ -496,7 +567,6 @@
                 }
             }
         }
-
     };
     // функция расчета диагонали справа-вниз
     Game.prototype.searchRightBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
@@ -607,8 +677,6 @@
                     returnBroukFig = self.broukFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
                 } else {
                     returnBroukFig = self.bishopSteps(corY, corX, self);
-                    console.log(corX);
-                    console.log(corY);
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
@@ -616,6 +684,90 @@
             }
         }
 
+    };
+    // функция расчета горизонтали влево
+    Game.prototype.searchLeftHorizontal = function (self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep){
+        var i,
+            corY,
+            corX;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        for ( i = Number(corsArray[0]) + numberStep; i <= 8; i++ ){
+            corY = Number(corsArray[1]);
+            corX = i;
+            if(numberStep === 0) {
+                returnBroukFig = self.broukFig(corY, corX, "leftHorizontal", horizontalArray, verticalArray);
+            } else {
+                returnBroukFig = self.rookSteps(corY, corX, self);
+            }
+            if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                break;
+            }
+        }
+    };
+    // функция расчета горизонтали вправо
+    Game.prototype.searchRightHorizontal = function (self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep){
+        var i,
+            corY,
+            corX;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        for ( i = Number(corsArray[0]) - 1; i >= 0; i-- ){
+            corY = Number(corsArray[1]);
+            corX = i;
+            if(numberStep === 0) {
+                returnBroukFig = self.broukFig(corY, corX, "rightHorizontal", horizontalArray, verticalArray);
+            } else {
+                returnBroukFig = self.rookSteps(corY, corX, self);
+            }
+            if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                break;
+            }
+        }
+    };
+    // функция расчета вертикали вверх
+    Game.prototype.searchTopVertical = function (self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep){
+        var i,
+            corY,
+            corX;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        for ( i = Number(corsArray[1]) + numberStep; i <= 8; i++ ){
+            corY = i;
+            corX = Number(corsArray[0]);
+            if(numberStep === 0) {
+                returnBroukFig = self.broukFig(corY, corX, "topVertical", horizontalArray, verticalArray);
+            } else {
+                returnBroukFig = self.rookSteps(corY, corX, self);
+            }
+            if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                break;
+            }
+        }
+    };
+    // функция расчета горизонтали вниз
+    Game.prototype.searchBottomVertical = function (self, corsArray, returnBroukFig, horizontalArray, verticalArray, numberStep){
+        var i,
+            corY,
+            corX;
+        if(numberStep != 0){
+            numberStep = 1;
+        }
+        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
+            corY = i;
+            corX = Number(corsArray[0]);
+            if(numberStep === 0) {
+                returnBroukFig = self.broukFig(corY, corX, "bottomVertical", horizontalArray, verticalArray);
+            } else {
+                returnBroukFig = self.rookSteps(corY, corX, self);
+            }
+            if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
+                break;
+            }
+        }
     };
     // функция сбора данных в диагональ
     Game.prototype.broukFig = function(corY, corX, wayfrom, leftDiagonalArray, rightDiagonalArray) {
@@ -636,6 +788,18 @@
         } else if(elem != null && wayfrom === "leftBottom") {
             disassembleItem = parseElem();
             return rightDiagonalArray.unshift(disassembleItem);
+        } else if(elem != null && wayfrom === "leftHorizontal") {
+            disassembleItem = parseElem();
+            return leftDiagonalArray.unshift(disassembleItem);
+        } else if(elem != null && wayfrom === "rightHorizontal") {
+            disassembleItem = parseElem();
+            return leftDiagonalArray.push(disassembleItem);
+        } else if(elem != null && wayfrom === "topVertical") {
+            disassembleItem = parseElem();
+            return rightDiagonalArray.unshift(disassembleItem);
+        } else if(elem != null && wayfrom === "bottomVertical") {
+            disassembleItem = parseElem();
+            return rightDiagonalArray.push(disassembleItem);
         }
         function parseElem() {
             elemClass = elem.className.slice(0,2);
@@ -643,61 +807,23 @@
             return newSubArray = [elemClass, elemName];
         }
     };
-    // циклы расчета ходов ладьи и ферзя
-    Game.prototype.moveRookAndForwardMoveQueen = function(self, corsArray, colorFigure) {
-        var elem,
-            i,
-            corsY,
-            corsX;
-        for ( i = Number(corsArray[1]) + 1; i <= 8; i++ ){
-            corsY = i;
-            corsX = Number(corsArray[0]);
-            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            var stopCycle = elemInspection(elem);
-            if(stopCycle === false){
-                break;
-            }
-        }
-        for ( i = Number(corsArray[1]) - 1; i >= 0; i-- ){
-            corsY = i;
-            corsX = Number(corsArray[0]);
-            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            var stopCycle = elemInspection(elem);
-            if(stopCycle === false){
-                break;
-            }
-        }
-        for ( i = Number(corsArray[0]) + 1; i <= 8; i++ ){
-            corsY = Number(corsArray[1]);
-            corsX = i;
-            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            var stopCycle = elemInspection(elem);
-            if(stopCycle === false){
-                break;
-            }
-        }
-        for ( i = Number(corsArray[0]) - 1; i >= 0; i-- ){
-            corsY = Number(corsArray[1]);
-            corsX = i;
-            elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]');
-            var stopCycle = elemInspection(elem);
-            if(stopCycle === false){
-                break;
-            }
-        }
-        function elemInspection(elem){
-            if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
-            } else if(elem != null && elem.childNodes.length !== 0){
-                if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
-                    elem.className += " kill";
-                    return false;
-                } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
-                    elem.className += " kill";
-                    return false;
-                } else {
-                    return false;
-                }
+    // шаги слона по координатам
+    Game.prototype.rookSteps = function (corsY, corsX, self){
+        console.log(corsX);
+        console.log(corsY);
+        var elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]'),
+            colorFigure = self.player;
+        if(elem != null && elem.childNodes.length === 0){
+            elem.className += " go";
+        } else if(elem != null && elem.childNodes.length !== 0){
+            if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                elem.className += " kill";
+                return false;
+            } else if (elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                elem.className += " kill";
+                return false;
+            } else {
+                return false;
             }
         }
     };
