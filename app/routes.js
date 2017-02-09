@@ -208,7 +208,6 @@ module.exports = function (app, passport, io) {
                                     if(figureName == cordsName){
                                         newFigurePosition[colorName][figureName][0] = cordsArray[1];
                                         newFigurePosition[colorName][figureName][1] = cordsArray[0];
-
                                         Game.update({joinedID: personID}, {
                                             walker: walker,
                                             figurePosition: newFigurePosition

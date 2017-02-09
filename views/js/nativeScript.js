@@ -266,7 +266,6 @@
             self.searchRightTop(self, corsArray, colorWalker);
             self.searchLeftBottom(self, corsArray, colorWalker);
         }
-
     };
     // функция расчета хода ферзя
     Game.prototype.calculationQueenMoves = function(self, target){
@@ -276,16 +275,25 @@
         if(self.player === 'white' && walker) {
             target.className  += ' focus';
             callSearchDiagonal(self);
+            callSearchForward(self);
+
         } else if(self.player === 'black' && !walker) {
             target.className  += ' focus';
             callSearchDiagonal(self);
+            callSearchForward(self);
+
         }
         function callSearchDiagonal(self){
             self.searchLeftTop(self, corsArray, colorWalker);
             self.searchRightBottom(self, corsArray, colorWalker);
             self.searchRightTop(self, corsArray, colorWalker);
             self.searchLeftBottom(self, corsArray, colorWalker);
-            self.moveRookAndForwardMoveQueen(self, corsArray, colorWalker);
+        }
+        function callSearchForward(self){
+            self.searchLeftHorizontal(self, corsArray, colorWalker);
+            self.searchRightHorizontal(self, corsArray, colorWalker);
+            self.searchTopVertical(self, corsArray, colorWalker);
+            self.searchBottomVertical(self, corsArray, colorWalker);
         }
     };
     // функция арсчета хода короля
@@ -296,68 +304,75 @@
             walker = document.body.classList.contains('white');
         if(self.player === 'white' && walker) {
             target.className  += ' focus';
-            knightMoveTop(corsX, corsY, 'white');
-            knightMoveBottom(corsX, corsY, 'white');
-            knightMoveLeft(corsX, corsY, 'white');
-            knightMoveRight(corsX, corsY, 'white');
+            kingMoveTop(corsX, corsY, 'white');
+            kingMoveBottom(corsX, corsY, 'white');
+            kingMoveLeft(corsX, corsY, 'white');
+            kingMoveRight(corsX, corsY, 'white');
         } else if(self.player === 'black' && !walker) {
             target.className  += ' focus';
-            knightMoveTop(corsX, corsY, 'black');
-            knightMoveBottom(corsX, corsY, 'black');
-            knightMoveLeft(corsX, corsY, 'black');
-            knightMoveRight(corsX, corsY, 'black');
+            kingMoveTop(corsX, corsY, 'black');
+            kingMoveBottom(corsX, corsY, 'black');
+            kingMoveLeft(corsX, corsY, 'black');
+            kingMoveRight(corsX, corsY, 'black');
         }
-        function knightMoveTop(corsX, corsY, colorFigure) {
+        function kingMoveTop(corsX, corsY, colorFigure) {
             var parentXCors,
                 parentYCors,
                 elem;
             parentXCors = corsX + 1;
             parentYCors = corsY + 1;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
             parentXCors = corsX - 1;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
             parentXCors = corsX;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
         }
-        function knightMoveBottom(corsX, corsY, colorFigure) {
+        function kingMoveBottom(corsX, corsY, colorFigure) {
             var parentXCors,
                 parentYCors,
                 elem;
             parentXCors = corsX + 1;
             parentYCors = corsY - 1;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
             parentXCors = corsX - 1;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
             parentXCors = corsX;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
         }
-        function knightMoveLeft(corsX, corsY, colorFigure) {
+        function kingMoveLeft(corsX, corsY, colorFigure) {
             var parentXCors,
                 parentYCors,
                 elem;
             parentXCors = corsX + 1;
             parentYCors = corsY;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
         }
-        function knightMoveRight(corsX, corsY, colorFigure) {
+        function kingMoveRight(corsX, corsY, colorFigure) {
             var parentXCors,
                 parentYCors,
                 elem;
             parentXCors = corsX - 1;
             parentYCors = corsY;
             elem = document.querySelector('[data-y="'+  parentYCors +'"] > td[data-x="'+  parentXCors +'"]');
-            elemInspection(elem, colorFigure);
+            elemInspection(elem, colorFigure, parentXCors, parentYCors);
         }
-        function elemInspection(elem, colorFigure){
+        function elemInspection(elem, colorFigure, parentXCors, parentYCors){
+            var result;
             if(elem != null && elem.childNodes.length === 0){
-                elem.className += " go";
+                result = self.broukenField(self, parentXCors, parentYCors);
+                console.log(result)
+                if(result == false || result == undefined) {
+                    return false;
+                } else {
+                    elem.className += " go";
+                }
             } else if(elem != null && elem.childNodes.length !== 0){
                 if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
                     elem.className += " kill";
@@ -518,11 +533,21 @@
                 }
             }
         }
-        if(queenPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
-            canIMove = false;
-        }
-        if(bishopPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
-            canIMove = false;
+        // console.log(leftDiagonalArray);
+        // console.log(rightDiagonalArray);
+        // console.log(horizontalArray);
+        // console.log(verticalArray);
+        // console.log(queenPosArr + " queen");
+        // console.log(bishopPosArr + " bishop");
+        // console.log(kingPosArr + " king");
+        // console.log(targetPosArr + " target");
+        if (typeof kingPosArr == "number") {
+            if(queenPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
+                canIMove = false;
+            }
+            if(bishopPosArr - kingPosArr === 2 && targetPosArr > kingPosArr && targetPosArr < queenPosArr){
+                canIMove = false;
+            }
         }
         if(canIMove === true){
             self.selectFigure(self, target);
@@ -530,12 +555,153 @@
           console.log('запуск функции расчета возможности удара по фигуре');
         }
     };
+    // функция проверки битого поля
+    Game.prototype.broukenField = function(self, parentXCors, parentYCors) {
+        var corsArray = [parentXCors, parentYCors],
+            walker = document.body.classList.contains('white'),
+            colorWalker = self.player,
+            broukenFiledResalt = true,
+            leftTopResult = [],
+            leftBottomResult = [],
+            rightTopResult = [],
+            rightBottomResult = [],
+            type,
+            canMove = false,
+            enemyFigure;
+        if(colorWalker === 'white' && walker) {
+            callSearchDiagonal(self);
+        } else if(colorWalker === 'black' && !walker) {
+            callSearchDiagonal(self);
+        }
+        function callSearchDiagonal(self){
+            leftTopResult = self.searchLeftTop(self, corsArray, "", "", "", "", "", true);
+            rightBottomResult = self.searchRightBottom(self, corsArray, "", "", "", "", "",true);
+            rightTopResult = self.searchRightTop(self, corsArray, "", "", "", "", "", true);
+            leftBottomResult = self.searchLeftBottom(self, corsArray, "", "", "", "", "", true);
+        }
+
+
+        for(var i = 0; i < leftTopResult.length; i++){
+            console.log(leftTopResult[i]);
+            if(leftTopResult[i] == undefined) {
+                continue;
+            } else {
+                type = leftTopResult[i].slice(0,5);
+                if(type === "enemy"){
+                    canMove = false;
+                    enemyFigure = leftTopResult[i].slice(7);
+                    if(enemyFigure === "P"){
+                        for(var y = i; y >= 0; y--){
+                            if((leftTopResult[y].slice(0,5) === 'empty' || leftTopResult[y].slice(0,7) === 'frendly') && i-y > 2) {
+                                canMove = true;
+                            }
+                        }
+                    } else if( enemyFigure === "B" || enemyFigure === "Q" ) {
+                        for(var y = i; y >= 0; y--){
+                            if(leftTopResult[y].slice(0,7) === 'frendly' && i-y > 2) {
+                                canMove = true;
+                            }
+                        }
+                    }
+                }
+            }
+            canMove === true
+        }
+        if(canMove === true){
+            parseLeftBottomResult()
+        }
+        function parseLeftBottomResult(){
+            for(var j = 0; j < leftBottomResult.length; j++){
+                if(leftBottomResult[i] == undefined) {
+                    continue;
+                } else {
+                    type = leftBottomResult[i].slice(0,5);
+                    if(type === "enemy"){
+                        enemyFigure = leftTopResult[i].slice(7);
+                        if(enemyFigure === "P"){
+                            for(var y = i; y >= 0; y--){
+                                if((leftTopResult[y].slice(0,5) === 'empty' || leftTopResult[y].slice(0,7) === 'frendly') && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+                        } else if( enemyFigure === "B" || enemyFigure === "Q" ) {
+                            for(var y = i; y >= 0; y--){
+                                if(leftTopResult[y].slice(0,7) === 'frendly' && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(canMove === true){
+            parseRightBottomResult()
+        }
+        function parseRightTopResult(){
+            for(var k = 0; k < rightTopResult.length; k++){
+                if(rightTopResult[i] == undefined) {
+                    continue;
+                } else {
+                    type = rightTopResult[i].slice(0,5);
+                    if(type === "enemy"){
+                        enemyFigure = leftTopResult[i].slice(7);
+                        if(enemyFigure === "P"){
+                            for(var y = i; y >= 0; y--){
+                                if((leftTopResult[y].slice(0,5) === 'empty' || leftTopResult[y].slice(0,7) === 'frendly') && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+
+                        } else if( enemyFigure === "B" || enemyFigure === "Q" ) {
+                            for(var y = i; y >= 0; y--){
+                                if(leftTopResult[y].slice(0,7) === 'frendly' && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        if(canMove === true){
+            parseRightBottomResult()
+        }
+        function parseRightBottomResult(){
+            for(var z = 0; z < rightBottomResult.length; z++){
+                if(rightBottomResult[i] == undefined) {
+                    continue;
+                } else {
+                    type = rightBottomResult[i].slice(0,5);
+                    if(type === "enemy"){
+                        enemyFigure = leftTopResult[i].slice(7);
+                        if(enemyFigure === "P"){
+                            for(var y = i; y >= 0; y--){
+                                if((leftTopResult[y].slice(0,5) === 'empty' || leftTopResult[y].slice(0,7) === 'frendly') && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+                        } else if( enemyFigure === "B" || enemyFigure === "Q" ) {
+                            for(var y = i; y >= 0; y--){
+                                if(leftTopResult[y].slice(0,7) === 'frendly' && i-y > 2) {
+                                    canMove = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canMove;
+    };
     // функция расчета диагонали слева-вверх
-    Game.prototype.searchLeftTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+    Game.prototype.searchLeftTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep, broukenFiled){
         var i = 0,
             corX = 0,
-            corY = 0;
-        if(numberStep != 0){
+            corY = 0,
+            arrayOfbroukFig = [];
+        if(numberStep != 0 && numberStep != 2){
             numberStep = 1;
         }
         if(self.player == 'white'){
@@ -543,10 +709,18 @@
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    arrayOfbroukFig.push(returnBroukFig);
+                    if(returnBroukFig === false){
+                        return arrayOfbroukFig;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
@@ -557,22 +731,31 @@
                 diferent =  Number(corsArray[0]) - i;
                 corX = i;
                 corY = Number(corsArray[1]) - diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    if(returnBroukFig === false){
+                        return false;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "leftTop", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
+        return arrayOfbroukFig;
     };
     // функция расчета диагонали справа-вниз
-    Game.prototype.searchRightBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+    Game.prototype.searchRightBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep, broukenFiled){
         var i = 0,
             corX = 0,
-            corY = 0;
+            corY = 0,
+            arrayOfbroukFig = [];
         if(numberStep != 0){
             numberStep = 1;
         }
@@ -582,37 +765,53 @@
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    arrayOfbroukFig.push(returnBroukFig)
+                    if(returnBroukFig === false){
+                        return arrayOfbroukFig;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         } else {
-            for ( i = Number(corsArray[0]) + numberStep; i > 0; i++ ){
+            for ( i = Number(corsArray[0]) + 1 ; i > 0; i++ ){
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    if(returnBroukFig === false){
+                        return false;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "rightBottom", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
-
+        return arrayOfbroukFig;
     };
     // функция расчета диагонали справа-вверх
-    Game.prototype.searchRightTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+    Game.prototype.searchRightTop = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep, broukenFiled){
         var i = 0,
             corX = 0,
-            corY = 0;
+            corY = 0,
+            arrayOfbroukFig = [];
         if(numberStep != 0){
             numberStep = 1;
         }
@@ -621,10 +820,18 @@
                 diferent = Number(corsArray[0]) - i;
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    arrayOfbroukFig.push(returnBroukFig);
+                    if(returnBroukFig === false){
+                        return arrayOfbroukFig;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
@@ -635,22 +842,31 @@
                 diferent = Number(corsArray[0]) - i;
                 corX = i;
                 corY = Number(corsArray[1]) + diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    if(returnBroukFig === false){
+                        return false;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "rightTop", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
+        return arrayOfbroukFig;
     };
     // функция расчета диагонали слева-вниз
-    Game.prototype.searchLeftBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep){
+    Game.prototype.searchLeftBottom = function (self, corsArray, diferent, returnBroukFig, leftDiagonalArray, rightDiagonalArray, numberStep, broukenFiled){
         var i = 0,
             corX = 0,
-            corY = 0;
+            corY = 0,
+            arrayOfbroukFig = [];
         if(numberStep != 0){
             numberStep = 1;
         }
@@ -659,30 +875,46 @@
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) - diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    arrayOfbroukFig.push(returnBroukFig)
+                    if(returnBroukFig === false){
+                        return arrayOfbroukFig;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         } else {
-            for ( i = Number(corsArray[0]) - numberStep; i <= 8; i-- ){
+            for ( i = Number(corsArray[0]) - 1 ; i <= 8; i-- ){
                 diferent = i - Number(corsArray[0]);
                 corX = i;
                 corY = Number(corsArray[1]) - diferent;
-                if(numberStep === 0) {
-                    returnBroukFig = self.broukFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                if (broukenFiled === true) {
+                    returnBroukFig = self.bishopStepsBrouken(corY, corX, self);
+                    if(returnBroukFig === false){
+                        return false;
+                    }
                 } else {
-                    returnBroukFig = self.bishopSteps(corY, corX, self);
+                    if(numberStep === 0) {
+                        returnBroukFig = self.broukenFig(corY, corX, "leftBottom", leftDiagonalArray, rightDiagonalArray);
+                    } else {
+                        returnBroukFig = self.bishopSteps(corY, corX, self);
+                    }
                 }
                 if(corX >= 8 || corX <= 0 || corY >= 8 || corY <= 0 || returnBroukFig === false) {
                     break;
                 }
             }
         }
+        return arrayOfbroukFig;
 
     };
     // функция расчета горизонтали влево
@@ -697,7 +929,7 @@
             corY = Number(corsArray[1]);
             corX = i;
             if(numberStep === 0) {
-                returnBroukFig = self.broukFig(corY, corX, "leftHorizontal", horizontalArray, verticalArray);
+                returnBroukFig = self.broukenFig(corY, corX, "leftHorizontal", horizontalArray, verticalArray);
             } else {
                 returnBroukFig = self.rookSteps(corY, corX, self);
             }
@@ -718,7 +950,7 @@
             corY = Number(corsArray[1]);
             corX = i;
             if(numberStep === 0) {
-                returnBroukFig = self.broukFig(corY, corX, "rightHorizontal", horizontalArray, verticalArray);
+                returnBroukFig = self.broukenFig(corY, corX, "rightHorizontal", horizontalArray, verticalArray);
             } else {
                 returnBroukFig = self.rookSteps(corY, corX, self);
             }
@@ -739,7 +971,7 @@
             corY = i;
             corX = Number(corsArray[0]);
             if(numberStep === 0) {
-                returnBroukFig = self.broukFig(corY, corX, "topVertical", horizontalArray, verticalArray);
+                returnBroukFig = self.broukenFig(corY, corX, "topVertical", horizontalArray, verticalArray);
             } else {
                 returnBroukFig = self.rookSteps(corY, corX, self);
             }
@@ -760,7 +992,7 @@
             corY = i;
             corX = Number(corsArray[0]);
             if(numberStep === 0) {
-                returnBroukFig = self.broukFig(corY, corX, "bottomVertical", horizontalArray, verticalArray);
+                returnBroukFig = self.broukenFig(corY, corX, "bottomVertical", horizontalArray, verticalArray);
             } else {
                 returnBroukFig = self.rookSteps(corY, corX, self);
             }
@@ -770,7 +1002,7 @@
         }
     };
     // функция сбора данных в диагональ
-    Game.prototype.broukFig = function(corY, corX, wayfrom, leftDiagonalArray, rightDiagonalArray) {
+    Game.prototype.broukenFig = function(corY, corX, wayfrom, leftDiagonalArray, rightDiagonalArray) {
         var elem = document.querySelector('[data-y="'+ corY +'"] > [data-x="' + corX + '"] > span'),
             elemClass,
             elemName,
@@ -809,8 +1041,6 @@
     };
     // шаги слона по координатам
     Game.prototype.rookSteps = function (corsY, corsX, self){
-        console.log(corsX);
-        console.log(corsY);
         var elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]'),
             colorFigure = self.player;
         if(elem != null && elem.childNodes.length === 0){
@@ -843,6 +1073,33 @@
             } else {
                 return false;
             }
+        }
+    };
+    // шаги слона для битого поля
+    Game.prototype.bishopStepsBrouken = function (corsY, corsX, self){
+        var elem = document.querySelector('[data-y="'+  corsY +'"] > td[data-x="'+  corsX +'"]'),
+            colorFigure = self.player,
+            result;
+        if(elem != null && elem.childNodes.length !== 0){
+            if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "white"){
+                result = "enemy " + elem.childNodes[0].className;
+                return result;
+            } else if(elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "black"){
+                result = "enemy " + elem.childNodes[0].className;
+                return result;
+            } else if(elem.childNodes[0].className.slice(0,1) === 'w' && colorFigure === "white"){
+                result = "frendly " + elem.childNodes[0].className;
+                return result;
+            } else if(elem.childNodes[0].className.slice(0,1) === 'b' && colorFigure === "black"){
+                result = "frendly " + elem.childNodes[0].className;
+                return result;
+            } else {
+                result = "empty";
+                return result;
+            }
+        } else {
+            result = "empty";
+            return result;
         }
     };
     // функция считывания координат и удаление фокуса с фигур
